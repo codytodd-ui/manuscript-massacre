@@ -55,12 +55,13 @@ function buildSystemPrompt(persona, mode) {
     '',
     'You are mentoring the author of a piece of writing submitted to "Manuscript Mentors." Speak entirely in your own voice and sensibility. Be specific: refer to actual moments, lines, or choices in the text rather than generic praise or complaint. Do not summarize the piece back to the author; they know what they wrote.',
     '',
-    'Respond with ONLY a JSON object (no markdown fences, no preamble) of exactly this shape:',
-    '{',
-    '  "verdict": "one vivid sentence, max ~20 words, delivering your overall judgement in your voice",',
-    '  "score": <integer 0-100 — your rating of the writing on its own terms>,',
-    '  "critique": "your full critique, 150-350 words, in your voice. Use plain paragraphs; you may use short markdown like **bold** or a bulleted list, but no headings."',
-    '}',
+    'Respond in EXACTLY this format, with these four labels on their own lines, and nothing before or after:',
+    '',
+    'SCORE: <a single integer from 0 to 100 — your rating of the writing on its own terms>',
+    'VERDICT: <one vivid sentence, max ~20 words, delivering your overall judgement in your voice>',
+    'SUMMARY: <1-2 sentences in plain, modern, everyday English — NOT your archaic or stylized voice — that plainly explain what you think of this writing, as if telling a friend your honest bottom line>',
+    'CRITIQUE:',
+    '<your full critique, 150-350 words, in your voice. Use plain paragraphs; you may use short markdown like **bold** or a bulleted list, but no headings. Write freely here — line breaks and paragraphs are fine.>',
   ].join('\n');
 }
 
@@ -68,7 +69,7 @@ async function critiqueAsPersona(persona, mode, manuscript, apiKey) {
   const system = buildSystemPrompt(persona, mode);
   const body = {
     model: MODEL,
-    max_tokens: 1200,
+    max_tokens: 1500,
     system,
     messages: [
       {
@@ -104,24 +105,39 @@ async function critiqueAsPersona(persona, mode, manuscript, apiKey) {
 }
 
 function parseCritique(raw) {
-  // Strip accidental code fences, then find the JSON object.
-  let s = raw.replace(/^```(?:json)?/i, '').replace(/```$/i, '').trim();
-  const start = s.indexOf('{');
-  const end = s.lastIndexOf('}');
-  if (start !== -1 && end !== -1 && end > start) {
-    s = s.slice(start, end + 1);
+  const text = String(raw).replace(/```+(?:\w+)?/g, '').trim();
+
+  // If the model returned a single-line JSON object (rare), honor it.
+  if (text.startsWith('{')) {
+    try {
+      const obj = JSON.parse(text.slice(0, text.lastIndexOf('}') + 1));
+      if (obj && (obj.critique || obj.verdict)) {
+        return {
+          verdict: String(obj.verdict || '').trim(),
+          score: clampScore(obj.score),
+          summary: String(obj.summary || '').trim(),
+          critique: String(obj.critique || '').trim(),
+        };
+      }
+    } catch { /* fall through to delimited parsing */ }
   }
-  try {
-    const obj = JSON.parse(s);
-    return {
-      verdict: String(obj.verdict || '').trim(),
-      score: clampScore(obj.score),
-      critique: String(obj.critique || '').trim(),
-    };
-  } catch {
-    // Fallback: the model didn't give clean JSON — surface its prose anyway.
-    return { verdict: '', score: null, critique: raw };
-  }
+
+  // Primary format: SCORE / VERDICT / SUMMARY / CRITIQUE labels. Tolerates any
+  // characters (newlines, quotes, markdown) in the free-form critique body.
+  const scoreM = text.match(/SCORE\s*:?\s*(\d{1,3})/i);
+  const verdictM = text.match(/VERDICT\s*:?\s*(.+?)(?=\n\s*(?:SUMMARY|CRITIQUE)\b|$)/is);
+  const summaryM = text.match(/SUMMARY\s*:?\s*([\s\S]+?)(?=\n\s*CRITIQUE\b|$)/i);
+  const critiqueM = text.match(/CRITIQUE\s*:?\s*\n?([\s\S]+)$/i);
+
+  const verdict = verdictM ? verdictM[1].trim() : '';
+  const summary = summaryM ? summaryM[1].trim() : '';
+  let critique = critiqueM ? critiqueM[1].trim() : '';
+  const score = scoreM ? clampScore(scoreM[1]) : null;
+
+  // If the model ignored the format entirely, at least surface its prose.
+  if (!critique && !verdict && !summary && score === null) critique = text;
+
+  return { verdict, score, summary, critique };
 }
 
 function clampScore(n) {
