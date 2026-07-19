@@ -1,0 +1,582 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Manuscript Mentors — thoughtful feedback from fifty great minds</title>
+  <meta name="description" content="Paste or upload your writing, choose up to 5 of 50 great mentors, and pick how you'd like to be read: tough love, a balanced critique, a kind encouraging read, a craft breakdown, or a deep thematic analysis." />
+  <!-- Optional document parsers (loaded from CDN; only needed for .docx / .pdf uploads). -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js" defer></script>
+  <style>
+    :root {
+      --bg: #14110b;
+      --bg-2: #1b1610;
+      --panel: #201a12;
+      --panel-2: #2a2317;
+      --ink: #f5efe1;
+      --muted: #beb096;
+      --faint: #82735b;
+      --accent: #cf9a3f;     /* warm gold — primary */
+      --accent-2: #ecc067;   /* brighter gold */
+      --sage: #7fb094;       /* encouraging green — chosen/approved */
+      --gold: #cf9a3f;
+      --line: #362d1f;
+      --ok: #7fb094;
+      --shadow: 0 20px 50px rgba(0,0,0,.45);
+      --radius: 14px;
+      --serif: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif;
+      --sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+    body {
+      background: radial-gradient(1200px 700px at 50% -200px, #2e2411 0%, var(--bg) 55%) fixed;
+      color: var(--ink);
+      font-family: var(--sans);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+    a { color: var(--accent-2); }
+    .wrap { max-width: 1080px; margin: 0 auto; padding: 0 20px 120px; }
+
+    /* Hero */
+    header.hero { text-align: center; padding: 64px 20px 36px; }
+    .kicker {
+      font-family: var(--sans); letter-spacing: .32em; text-transform: uppercase;
+      font-size: 12px; color: var(--accent); font-weight: 600;
+    }
+    h1.title {
+      font-family: var(--serif); font-weight: 800; letter-spacing: -.01em;
+      font-size: clamp(42px, 8vw, 84px); line-height: .98; margin: 10px 0 6px;
+      background: linear-gradient(180deg, #fff 0%, #f0dcb0 55%, var(--accent) 120%);
+      -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+      text-shadow: 0 2px 40px rgba(207,154,63,.22);
+    }
+    .subtitle { color: var(--muted); max-width: 640px; margin: 8px auto 0; font-size: 17px; }
+    .blade { width: 120px; height: 2px; margin: 22px auto 0; background: linear-gradient(90deg, transparent, var(--accent), transparent); }
+
+    /* Steps */
+    section.step {
+      background: linear-gradient(180deg, var(--panel), var(--bg-2));
+      border: 1px solid var(--line); border-radius: var(--radius);
+      padding: 26px; margin-top: 22px; box-shadow: var(--shadow);
+    }
+    .step-head { display: flex; align-items: baseline; gap: 14px; margin-bottom: 6px; }
+    .step-num {
+      font-family: var(--serif); font-weight: 800; font-size: 26px; color: var(--accent);
+      width: 42px; height: 42px; flex: none; display: grid; place-items: center;
+      border: 1px solid var(--line); border-radius: 50%; background: var(--panel-2);
+    }
+    .step-title { font-family: var(--serif); font-size: 24px; font-weight: 700; margin: 0; }
+    .step-sub { color: var(--muted); font-size: 14px; margin: 2px 0 18px 56px; }
+    @media (max-width: 560px) { .step-sub { margin-left: 0; } }
+
+    /* Input tabs */
+    .tabs { display: inline-flex; background: var(--panel-2); border: 1px solid var(--line); border-radius: 10px; padding: 4px; gap: 4px; }
+    .tab {
+      border: 0; background: transparent; color: var(--muted); font: inherit; font-weight: 600;
+      padding: 8px 16px; border-radius: 8px; cursor: pointer;
+    }
+    .tab.active { background: var(--accent); color: #241900; }
+    textarea#manuscript {
+      width: 100%; min-height: 220px; margin-top: 14px; resize: vertical;
+      background: #100d09; color: var(--ink); border: 1px solid var(--line);
+      border-radius: 12px; padding: 16px; font-family: var(--serif); font-size: 16px; line-height: 1.7;
+    }
+    textarea#manuscript:focus, .drop:focus-within { outline: 2px solid var(--accent); outline-offset: 1px; }
+    .drop {
+      margin-top: 14px; border: 1.5px dashed #4a3d28; border-radius: 12px; padding: 34px 18px;
+      text-align: center; color: var(--muted); cursor: pointer; background: #100d09; transition: border-color .15s, background .15s;
+    }
+    .drop.drag { border-color: var(--accent-2); background: #181206; color: var(--ink); }
+    .drop strong { color: var(--ink); }
+    .filetypes { font-size: 12px; color: var(--faint); margin-top: 6px; }
+    .metaline { display: flex; justify-content: space-between; gap: 12px; margin-top: 10px; font-size: 13px; color: var(--faint); }
+    .metaline .fname { color: var(--accent); }
+    .hidden { display: none !important; }
+
+    /* Mentor grid */
+    .controls { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 16px; }
+    input#search {
+      flex: 1; min-width: 200px; background: #100d09; border: 1px solid var(--line); color: var(--ink);
+      border-radius: 10px; padding: 10px 14px; font: inherit;
+    }
+    input#search:focus { outline: 2px solid var(--accent); }
+    .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+    .chip {
+      border: 1px solid var(--line); background: var(--panel-2); color: var(--muted);
+      padding: 6px 12px; border-radius: 999px; font-size: 13px; font-weight: 600; cursor: pointer;
+    }
+    .chip.active { background: var(--accent); color: #241900; border-color: var(--accent); }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(228px, 1fr)); gap: 12px; }
+    .pcard {
+      position: relative; text-align: left; cursor: pointer;
+      background: var(--panel-2); border: 1px solid var(--line); border-radius: 12px; padding: 14px;
+      display: flex; gap: 12px; transition: transform .1s, border-color .15s, box-shadow .15s;
+    }
+    .pcard:hover { transform: translateY(-2px); border-color: #55462e; }
+    .pcard.selected { border-color: var(--sage); box-shadow: 0 0 0 1px var(--sage), 0 8px 24px rgba(127,176,148,.22); background: #16201a; }
+    .pcard.disabled { opacity: .38; cursor: not-allowed; }
+    .pcard.disabled:hover { transform: none; }
+    .avatar {
+      width: 44px; height: 44px; flex: none; border-radius: 10px; display: grid; place-items: center;
+      font-family: var(--serif); font-weight: 800; font-size: 17px; color: #fff;
+    }
+    .pname { font-weight: 700; font-size: 15px; line-height: 1.25; }
+    .ptag { color: var(--faint); font-size: 12px; margin-top: 1px; }
+    .pline { color: var(--muted); font-size: 12.5px; margin-top: 7px; line-height: 1.45; }
+    .pcat { display: inline-block; margin-top: 8px; font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--accent); font-weight: 700; }
+    .check {
+      position: absolute; top: 10px; right: 10px; width: 20px; height: 20px; border-radius: 50%;
+      background: var(--sage); color: #06210f; display: none; place-items: center; font-size: 13px; font-weight: 800;
+    }
+    .pcard.selected .check { display: grid; }
+
+    /* Modes */
+    .modes { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px; }
+    .mode {
+      text-align: left; cursor: pointer; background: var(--panel-2); border: 1px solid var(--line);
+      border-radius: 12px; padding: 16px; transition: border-color .15s, background .15s, transform .1s;
+    }
+    .mode:hover { transform: translateY(-2px); }
+    .mode.selected { border-color: var(--sage); background: #16201a; box-shadow: 0 0 0 1px var(--sage); }
+    .mode .emoji { font-size: 22px; }
+    .mode .mname { font-weight: 700; margin-top: 6px; }
+    .mode .mdesc { color: var(--muted); font-size: 12.5px; margin-top: 4px; }
+
+    /* Action */
+    .actionbar { position: sticky; bottom: 0; margin-top: 26px; padding-top: 8px; }
+    .actioninner {
+      display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 14px;
+      background: linear-gradient(180deg, rgba(27,22,16,.75), rgba(20,17,11,.95));
+      backdrop-filter: blur(8px); border: 1px solid var(--line); border-radius: 14px; padding: 14px 18px;
+    }
+    .readout { font-size: 13.5px; color: var(--muted); }
+    .readout b { color: var(--ink); }
+    button.slay {
+      border: 0; cursor: pointer; font: inherit; font-weight: 800; letter-spacing: .02em;
+      color: #241900; background: linear-gradient(180deg, var(--accent-2), var(--accent));
+      padding: 14px 28px; border-radius: 12px; font-size: 16px; box-shadow: 0 10px 24px rgba(207,154,63,.32);
+    }
+    button.slay:disabled { opacity: .45; cursor: not-allowed; box-shadow: none; }
+    button.slay:not(:disabled):hover { filter: brightness(1.06); }
+
+    /* Results */
+    #results { margin-top: 30px; scroll-margin-top: 20px; }
+    .results-head { text-align: center; margin-bottom: 8px; }
+    .results-head h2 { font-family: var(--serif); font-size: 32px; margin: 0; }
+    .results-head p { color: var(--muted); margin: 4px 0 0; }
+    .rcard {
+      background: linear-gradient(180deg, var(--panel), var(--bg-2)); border: 1px solid var(--line);
+      border-radius: 14px; padding: 22px; margin-top: 16px; box-shadow: var(--shadow);
+    }
+    .rtop { display: flex; align-items: center; gap: 14px; }
+    .rname { font-family: var(--serif); font-size: 21px; font-weight: 700; }
+    .rtag { color: var(--faint); font-size: 12.5px; }
+    .rscore { margin-left: auto; text-align: right; flex: none; }
+    .rscore .num { font-family: var(--serif); font-weight: 800; font-size: 30px; line-height: 1; }
+    .rscore .lbl { font-size: 10.5px; letter-spacing: .12em; text-transform: uppercase; color: var(--faint); }
+    .verdict {
+      font-family: var(--serif); font-style: italic; font-size: 18px; color: #f3e6c6;
+      border-left: 3px solid var(--accent); padding: 6px 0 6px 14px; margin: 16px 0 12px;
+    }
+    .critique p { margin: 0 0 12px; }
+    .critique ul { margin: 0 0 12px; padding-left: 20px; }
+    .critique strong { color: #fff; }
+    .rerr { color: var(--accent-2); font-size: 14px; }
+
+    /* Loading */
+    .loading { text-align: center; padding: 40px 0; }
+    .spinner { width: 42px; height: 42px; margin: 0 auto 16px; border-radius: 50%; border: 3px solid var(--line); border-top-color: var(--accent-2); animation: spin 1s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loadmsg { color: var(--muted); }
+
+    .banner { background: #2a2010; border: 1px solid var(--accent); color: #f3dcae; padding: 12px 16px; border-radius: 10px; margin-top: 14px; font-size: 14px; }
+    footer { text-align: center; color: var(--faint); font-size: 12.5px; margin-top: 60px; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="hero">
+      <div class="kicker">Guidance from fifty great minds</div>
+      <h1 class="title">Manuscript&nbsp;Mentors</h1>
+      <p class="subtitle">Paste or upload your work. Gather up to <b>five of fifty</b> great minds — saints, novelists, poets, philosophers, and sharp-eyed wits — and choose exactly how you'd like to be mentored.</p>
+      <div class="blade"></div>
+    </header>
+
+    <!-- STEP 1 -->
+    <section class="step" id="step1">
+      <div class="step-head">
+        <div class="step-num">1</div>
+        <h2 class="step-title">Share your manuscript</h2>
+      </div>
+      <p class="step-sub">Drop in a <b>.txt, .md, .docx,</b> or <b>.pdf</b> file — or switch to paste.</p>
+
+      <div class="tabs" role="tablist">
+        <button class="tab active" id="tab-upload" role="tab">Upload file</button>
+        <button class="tab" id="tab-paste" role="tab">Paste text</button>
+      </div>
+
+      <div id="pane-upload">
+        <div class="drop" id="drop" tabindex="0" role="button" aria-label="Upload a document">
+          <div>📜 <strong>Drop a document here</strong> or click to browse</div>
+          <div class="filetypes">.txt · .md · .docx · .pdf</div>
+        </div>
+        <input type="file" id="fileinput" class="hidden" accept=".txt,.md,.markdown,.docx,.pdf,text/plain" />
+      </div>
+
+      <div id="pane-paste" class="hidden">
+        <textarea id="manuscript" placeholder="Paste the pages you'd like the mentors to read…"></textarea>
+      </div>
+
+      <div class="metaline">
+        <span id="fileinfo"></span>
+        <span id="wordcount">0 words</span>
+      </div>
+    </section>
+
+    <!-- STEP 2 -->
+    <section class="step" id="step2">
+      <div class="step-head">
+        <div class="step-num">2</div>
+        <h2 class="step-title">Choose your mentors</h2>
+      </div>
+      <p class="step-sub">Pick up to <b>5</b>. Each reads with their own wisdom, values, and voice.</p>
+
+      <div class="controls">
+        <input id="search" type="search" placeholder="Search 50 mentors by name…" autocomplete="off" />
+        <div class="chips" id="chips"></div>
+      </div>
+      <div class="grid" id="grid"></div>
+    </section>
+
+    <!-- STEP 3 -->
+    <section class="step" id="step3">
+      <div class="step-head">
+        <div class="step-num">3</div>
+        <h2 class="step-title">Choose your critique style</h2>
+      </div>
+      <p class="step-sub">How would you like to be read?</p>
+      <div class="modes" id="modes"></div>
+    </section>
+
+    <div id="errorbanner"></div>
+
+    <!-- ACTION -->
+    <div class="actionbar">
+      <div class="actioninner">
+        <div class="readout" id="readout">Add your writing, pick your mentors, choose a style.</div>
+        <button class="slay" id="slay" disabled>Summon your mentors</button>
+      </div>
+    </div>
+
+    <!-- RESULTS -->
+    <div id="results"></div>
+
+    <footer>
+      Manuscript Mentors · 50 mentors, 5 perspectives, one better draft · Feedback is AI-generated in the spirit of each figure's known sensibility, not the real person.
+    </footer>
+  </div>
+
+  <script>
+    // ---------- State ----------
+    const MODES = [
+      { key: 'roast',    emoji: '🔥', name: 'Tough Love',         desc: 'Blunt and unsparing — but every note is earned.' },
+      { key: 'balanced', emoji: '⚖️', name: 'Balanced Critique', desc: 'Fair and even-handed. Strengths and weaknesses.' },
+      { key: 'kind',     emoji: '🕊️', name: 'Kind & Encouraging',desc: 'Warm and generous, honest but gentle.' },
+      { key: 'craft',    emoji: '✍️', name: 'Craft & Style',      desc: 'Sentences, rhythm, structure, mechanics.' },
+      { key: 'thematic', emoji: '🧠', name: 'Themes & Ideas',     desc: 'Deep dive into meaning, worldview, coherence.' },
+    ];
+    const MAX_PICKS = 5;
+    const AVATAR_COLORS = ['#7b2d3a','#5b3a7b','#2d5b7b','#2d7b57','#7b662d','#7b2d6b','#3a5b2d','#7b3a2d'];
+
+    let PERSONAS = [];
+    let manuscriptText = '';
+    const selected = new Set();
+    let activeCategory = 'All';
+    let searchTerm = '';
+    let selectedMode = null;
+
+    // ---------- Boot ----------
+    async function boot() {
+      try {
+        const res = await fetch('data/personas.json');
+        PERSONAS = await res.json();
+      } catch (e) {
+        showError('Could not load the mentor roster. If you opened this file directly, run it through the dev server (see README).');
+        return;
+      }
+      renderChips();
+      renderGrid();
+      renderModes();
+      wireInputs();
+      updateReadout();
+    }
+
+    // ---------- Step 1: input ----------
+    function wireInputs() {
+      const ta = document.getElementById('manuscript');
+      ta.addEventListener('input', () => { manuscriptText = ta.value; onTextChanged(); });
+
+      document.getElementById('tab-paste').addEventListener('click', () => switchTab('paste'));
+      document.getElementById('tab-upload').addEventListener('click', () => switchTab('upload'));
+
+      const drop = document.getElementById('drop');
+      const fi = document.getElementById('fileinput');
+      drop.addEventListener('click', () => fi.click());
+      drop.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); fi.click(); } });
+      fi.addEventListener('change', () => { if (fi.files[0]) readFile(fi.files[0]); });
+      ['dragover','dragenter'].forEach(ev => drop.addEventListener(ev, (e) => { e.preventDefault(); drop.classList.add('drag'); }));
+      ['dragleave','drop'].forEach(ev => drop.addEventListener(ev, (e) => { e.preventDefault(); drop.classList.remove('drag'); }));
+      drop.addEventListener('drop', (e) => { const f = e.dataTransfer.files[0]; if (f) readFile(f); });
+
+      document.getElementById('search').addEventListener('input', (e) => { searchTerm = e.target.value.toLowerCase(); renderGrid(); });
+      document.getElementById('slay').addEventListener('click', runCritique);
+    }
+
+    function switchTab(which) {
+      document.getElementById('tab-paste').classList.toggle('active', which === 'paste');
+      document.getElementById('tab-upload').classList.toggle('active', which === 'upload');
+      document.getElementById('pane-paste').classList.toggle('hidden', which !== 'paste');
+      document.getElementById('pane-upload').classList.toggle('hidden', which !== 'upload');
+    }
+
+    function onTextChanged() {
+      const words = manuscriptText.trim() ? manuscriptText.trim().split(/\s+/).length : 0;
+      document.getElementById('wordcount').textContent = words.toLocaleString() + ' words';
+      updateReadout();
+    }
+
+    async function readFile(file) {
+      const info = document.getElementById('fileinfo');
+      info.innerHTML = 'Reading <span class="fname">' + escapeHtml(file.name) + '</span>…';
+      try {
+        const name = file.name.toLowerCase();
+        let text = '';
+        if (name.endsWith('.docx')) {
+          if (!window.mammoth) throw new Error('DOCX parser still loading — try again in a moment.');
+          const buf = await file.arrayBuffer();
+          const out = await window.mammoth.extractRawText({ arrayBuffer: buf });
+          text = out.value;
+        } else if (name.endsWith('.pdf')) {
+          text = await readPdf(file);
+        } else {
+          text = await file.text();
+        }
+        manuscriptText = text.trim();
+        document.getElementById('manuscript').value = manuscriptText;
+        info.innerHTML = 'Loaded <span class="fname">' + escapeHtml(file.name) + '</span>';
+        onTextChanged();
+      } catch (err) {
+        info.innerHTML = '<span class="rerr">Could not read that file: ' + escapeHtml(err.message) + '</span>';
+      }
+    }
+
+    async function readPdf(file) {
+      if (!window.pdfjsLib) throw new Error('PDF parser still loading — try again in a moment.');
+      window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+      const buf = await file.arrayBuffer();
+      const pdf = await window.pdfjsLib.getDocument({ data: buf }).promise;
+      let out = '';
+      for (let i = 1; i <= pdf.numPages; i++) {
+        const page = await pdf.getPage(i);
+        const content = await page.getTextContent();
+        out += content.items.map(it => it.str).join(' ') + '\n\n';
+      }
+      return out;
+    }
+
+    // ---------- Step 2: mentors ----------
+    function categories() {
+      const set = new Set(PERSONAS.map(p => p.category));
+      return ['All', ...Array.from(set).sort()];
+    }
+    function renderChips() {
+      const el = document.getElementById('chips');
+      el.innerHTML = '';
+      categories().forEach(cat => {
+        const b = document.createElement('button');
+        b.className = 'chip' + (cat === activeCategory ? ' active' : '');
+        b.textContent = cat;
+        b.onclick = () => { activeCategory = cat; renderChips(); renderGrid(); };
+        el.appendChild(b);
+      });
+    }
+    function initials(name) {
+      const parts = name.replace(/of |the /gi, '').split(/\s+/).filter(Boolean);
+      return ((parts[0]?.[0] || '') + (parts[parts.length - 1]?.[0] || '')).toUpperCase();
+    }
+    function colorFor(id) {
+      let h = 0; for (const c of id) h = (h * 31 + c.charCodeAt(0)) >>> 0;
+      return AVATAR_COLORS[h % AVATAR_COLORS.length];
+    }
+    function renderGrid() {
+      const grid = document.getElementById('grid');
+      grid.innerHTML = '';
+      const filtered = PERSONAS.filter(p =>
+        (activeCategory === 'All' || p.category === activeCategory) &&
+        (!searchTerm || p.name.toLowerCase().includes(searchTerm) || p.tag.toLowerCase().includes(searchTerm))
+      );
+      if (!filtered.length) { grid.innerHTML = '<p style="color:var(--muted)">No mentor by that name.</p>'; return; }
+      filtered.forEach(p => {
+        const atMax = selected.size >= MAX_PICKS && !selected.has(p.id);
+        const card = document.createElement('div');
+        card.className = 'pcard' + (selected.has(p.id) ? ' selected' : '') + (atMax ? ' disabled' : '');
+        card.setAttribute('role', 'button');
+        card.innerHTML =
+          '<div class="check">✓</div>' +
+          '<div class="avatar" style="background:' + colorFor(p.id) + '">' + initials(p.name) + '</div>' +
+          '<div><div class="pname">' + escapeHtml(p.name) + '</div>' +
+          '<div class="ptag">' + escapeHtml(p.tag) + '</div>' +
+          '<div class="pline">' + escapeHtml(p.tagline) + '</div>' +
+          '<span class="pcat">' + escapeHtml(p.category) + '</span></div>';
+        card.onclick = () => togglePersona(p.id, atMax);
+        grid.appendChild(card);
+      });
+    }
+    function togglePersona(id, atMax) {
+      if (selected.has(id)) selected.delete(id);
+      else { if (atMax) return; selected.add(id); }
+      renderGrid();
+      updateReadout();
+    }
+
+    // ---------- Step 3: modes ----------
+    function renderModes() {
+      const el = document.getElementById('modes');
+      el.innerHTML = '';
+      MODES.forEach(m => {
+        const d = document.createElement('div');
+        d.className = 'mode' + (selectedMode === m.key ? ' selected' : '');
+        d.innerHTML = '<div class="emoji">' + m.emoji + '</div><div class="mname">' + m.name + '</div><div class="mdesc">' + m.desc + '</div>';
+        d.onclick = () => { selectedMode = m.key; renderModes(); updateReadout(); };
+        el.appendChild(d);
+      });
+    }
+
+    // ---------- Readout + validation ----------
+    function updateReadout() {
+      const hasText = manuscriptText.trim().length >= 40;
+      const readout = document.getElementById('readout');
+      const bits = [];
+      bits.push(hasText ? '<b>Manuscript ready</b>' : 'Add your writing');
+      bits.push('<b>' + selected.size + '</b>/' + MAX_PICKS + ' mentors');
+      bits.push(selectedMode ? '<b>' + MODES.find(m => m.key === selectedMode).name + '</b>' : 'no style yet');
+      readout.innerHTML = bits.join(' &nbsp;·&nbsp; ');
+      document.getElementById('slay').disabled = !(hasText && selected.size > 0 && selectedMode);
+    }
+
+    // ---------- Run ----------
+    async function runCritique() {
+      showError('');
+      const btn = document.getElementById('slay');
+      btn.disabled = true;
+      const results = document.getElementById('results');
+      const chosen = PERSONAS.filter(p => selected.has(p.id));
+      results.innerHTML =
+        '<div class="rcard loading"><div class="spinner"></div>' +
+        '<div class="loadmsg">Your mentors are reading your work…<br><span style="color:var(--faint);font-size:13px">' +
+        chosen.map(p => p.name).join(' · ') + '</span></div></div>';
+      results.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+      try {
+        const res = await fetch('api/critique', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ text: manuscriptText, personaIds: Array.from(selected), mode: selectedMode }),
+        });
+        let data;
+        try {
+          data = await res.json();
+        } catch {
+          throw new Error(
+            res.status === 404
+              ? 'The critique backend isn’t running. Serve this app with `vercel dev` or deploy it (see the README) so /api/critique is available.'
+              : 'The server returned an unexpected response (' + res.status + ').'
+          );
+        }
+        if (!res.ok) throw new Error(data.error || ('Request failed (' + res.status + ')'));
+        renderResults(data);
+      } catch (err) {
+        results.innerHTML = '';
+        showError('Something went wrong: ' + err.message);
+      } finally {
+        btn.disabled = false;
+        updateReadout();
+      }
+    }
+
+    function renderResults(data) {
+      const results = document.getElementById('results');
+      const modeName = data.mode || '';
+      let html =
+        '<div class="results-head"><h2>What the Mentors Said</h2><p>' +
+        escapeHtml(modeName) + (data.truncated ? ' · <span style="color:var(--accent)">only the first ~30,000 characters were read</span>' : '') +
+        '</p></div>';
+      (data.results || []).forEach(r => {
+        html += '<div class="rcard">';
+        html += '<div class="rtop">' +
+          '<div class="avatar" style="background:' + colorFor(r.id) + '">' + initials(r.name) + '</div>' +
+          '<div><div class="rname">' + escapeHtml(r.name) + '</div><div class="rtag">' + escapeHtml(r.tag || '') + '</div></div>';
+        if (typeof r.score === 'number') {
+          html += '<div class="rscore"><div class="num" style="color:' + scoreColor(r.score) + '">' + r.score + '</div><div class="lbl">/ 100</div></div>';
+        }
+        html += '</div>';
+        if (r.error) {
+          html += '<p class="rerr">' + escapeHtml(r.error) + '</p>';
+        } else {
+          if (r.verdict) html += '<div class="verdict">“' + escapeHtml(r.verdict) + '”</div>';
+          html += '<div class="critique">' + renderMarkdown(r.critique || '') + '</div>';
+        }
+        html += '</div>';
+      });
+      results.innerHTML = html;
+    }
+
+    function scoreColor(s) {
+      if (s >= 75) return '#7fb094';
+      if (s >= 50) return '#cf9a3f';
+      if (s >= 30) return '#d98c3c';
+      return '#cf5a3a';
+    }
+
+    // ---------- Helpers ----------
+    function escapeHtml(s) {
+      return String(s).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+    }
+    // Minimal, safe markdown: escape first, then apply **bold** and simple bullet lists + paragraphs.
+    function renderMarkdown(text) {
+      const esc = escapeHtml(text.trim());
+      const lines = esc.split(/\n/);
+      let html = '', inList = false, para = [];
+      const flushPara = () => { if (para.length) { html += '<p>' + para.join(' ') + '</p>'; para = []; } };
+      const closeList = () => { if (inList) { html += '</ul>'; inList = false; } };
+      for (let line of lines) {
+        const t = line.trim();
+        if (/^([-*•])\s+/.test(t)) {
+          flushPara();
+          if (!inList) { html += '<ul>'; inList = true; }
+          html += '<li>' + inline(t.replace(/^([-*•])\s+/, '')) + '</li>';
+        } else if (t === '') {
+          flushPara(); closeList();
+        } else {
+          if (inList) closeList();
+          para.push(inline(t));
+        }
+      }
+      flushPara(); closeList();
+      return html || '<p></p>';
+    }
+    function inline(s) {
+      return s.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>').replace(/\*(.+?)\*/g, '<em>$1</em>');
+    }
+    function showError(msg) {
+      const el = document.getElementById('errorbanner');
+      el.innerHTML = msg ? '<div class="banner">' + escapeHtml(msg) + '</div>' : '';
+    }
+
+    boot();
+  </script>
+</body>
+</html>
