@@ -224,13 +224,68 @@
 
     .banner { background: #2a2010; border: 1px solid var(--accent); color: #f3dcae; padding: 12px 16px; border-radius: 10px; margin-top: 14px; font-size: 14px; }
     footer { text-align: center; color: var(--faint); font-size: 12.5px; margin-top: 60px; }
+
+    /* ---------- Mobile ---------- */
+    @media (max-width: 640px) {
+      body { -webkit-tap-highlight-color: rgba(207,154,63,.18); }
+      .wrap { padding: 0 14px 132px; }
+      header.hero { padding: 40px 6px 24px; }
+      .subtitle { font-size: 15.5px; }
+      .blade { margin-top: 18px; }
+
+      section.step { padding: 18px 15px; margin-top: 16px; }
+      .step-head { gap: 10px; }
+      .step-num { width: 36px; height: 36px; font-size: 21px; }
+      .step-title { font-size: 20px; }
+      .step-sub { font-size: 13.5px; margin-bottom: 14px; }
+
+      /* Full-width tabs = bigger touch targets */
+      .tabs { display: flex; width: 100%; }
+      .tab { flex: 1; padding: 12px 8px; text-align: center; }
+      textarea#manuscript { min-height: 180px; font-size: 16px; }
+      .drop { padding: 28px 14px; }
+      .metaline { flex-wrap: wrap; }
+
+      /* Search + chips */
+      .controls { gap: 8px; }
+      input#search { width: 100%; flex: 1 1 100%; min-width: 0; font-size: 16px; padding: 12px 14px; }
+      .chip { padding: 9px 14px; font-size: 13px; }
+
+      /* One comfortable column of critics/modes */
+      .grid { grid-template-columns: 1fr; gap: 10px; }
+      .pcard { padding: 13px; }
+      .modes { grid-template-columns: 1fr; gap: 10px; }
+      .mode { padding: 14px; }
+
+      /* Sticky action bar: stack, full-width button */
+      .actionbar { margin-top: 20px; }
+      .actioninner { flex-direction: column; align-items: stretch; gap: 10px; padding: 12px 14px; }
+      .readout { text-align: center; }
+      button.slay { width: 100%; padding: 15px; }
+
+      /* Results */
+      .rcard { padding: 16px; }
+      .results-head h2 { font-size: 26px; }
+      .rtop { gap: 11px; }
+      .rname { font-size: 18px; }
+      .rscore .num { font-size: 24px; }
+      .verdict { font-size: 16px; }
+
+      /* Summary card: center the ring, stack the heading + PDF button */
+      .summary-top { flex-direction: column; align-items: center; text-align: center; gap: 12px; }
+      .summary-headrow { width: 100%; min-width: 0; flex-direction: column; align-items: stretch; gap: 12px; }
+      .avgring { width: 84px; height: 84px; }
+      .pdfbtn { width: 100%; padding: 13px; font-size: 15px; }
+      .summary-list li { gap: 10px; }
+      .sl-body { font-size: 14.5px; }
+    }
   </style>
 </head>
 <body>
   <div class="wrap">
     <header class="hero">
       <div class="kicker">Guidance from fifty great minds</div>
-      <h1 class="title">Manuscript&nbsp;Mentors</h1>
+      <h1 class="title">Manuscript Mentors</h1>
       <p class="subtitle">Paste or upload your work. Gather up to <b>five of fifty</b> great minds — saints, novelists, poets, philosophers, and sharp-eyed wits — and choose exactly how you'd like to be mentored.</p>
       <div class="blade"></div>
     </header>
