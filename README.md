@@ -44,11 +44,12 @@ plus 43 more.
 A pure static page can't call an LLM or hold accounts, so this ships as a real app with
 a small backend.
 
-> **Persistence caveat.** `data/db.json` persists on any long-lived Node process (the
-> bundled `server.mjs`), but on ephemeral/serverless filesystems (e.g. Vercel) it can
-> reset on cold starts — so accounts and history won't survive there. For production,
-> swap [`lib/store.js`](lib/store.js) for a real database (Postgres, Vercel KV, Upstash)
-> and use a shared rate-limit store; the rest of the app is unchanged.
+> **Where data lives.** [`lib/store.js`](lib/store.js) has two backends and picks one
+> automatically: a **Redis/KV** store when `KV_REST_API_URL` + `KV_REST_API_TOKEN`
+> (Vercel KV) or `UPSTASH_REDIS_REST_URL` + `UPSTASH_REDIS_REST_TOKEN` are set, otherwise
+> the local `data/db.json` file. Use the file locally (`npm start`); **add a KV store on
+> Vercel** (see Deploy below), since its filesystem is read-only and the file store can't
+> persist there.
 
 ## Run it locally
 
@@ -83,9 +84,26 @@ the [Vercel CLI](https://vercel.com/docs/cli) and a `.env.local`).
 
 1. Push this folder to a GitHub repo (or run `vercel` in the folder).
 2. Import it at [vercel.com/new](https://vercel.com/new).
-3. In **Project → Settings → Environment Variables**, add `ANTHROPIC_API_KEY`.
-   (Optionally add `ANTHROPIC_MODEL`.)
-4. Deploy. You'll get a public URL you can share.
+3. In **Project → Settings → Environment Variables**, add `ANTHROPIC_API_KEY` and a
+   strong random `SESSION_SECRET`. (Optionally add `ANTHROPIC_MODEL`.)
+4. **For accounts & saved history, add a KV store** (required — see below).
+5. Deploy. You'll get a public URL you can share.
+
+#### Accounts on Vercel need a KV store (important)
+
+Vercel's filesystem is **read-only**, so the local file store can't save accounts there —
+signups won't persist and login won't work. Add a Redis-compatible KV store and the app
+switches to it automatically:
+
+1. In your Vercel project → **Storage → Create Database → Upstash for Redis** (Vercel KV),
+   and connect it to the project.
+2. That injects `KV_REST_API_URL` and `KV_REST_API_TOKEN` env vars automatically
+   (Upstash's `UPSTASH_REDIS_REST_URL` / `UPSTASH_REDIS_REST_TOKEN` are also recognized).
+3. **Redeploy.** On boot the store uses KV when those vars are present (falling back to
+   the local file only for `npm start`). No code changes needed.
+
+The roster is served from `GET /api/personas` (a function), so the mentor list and the
+login/critique UI load reliably even where static-file serving behaves unexpectedly.
 
 ### Netlify
 

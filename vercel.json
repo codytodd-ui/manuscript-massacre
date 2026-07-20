@@ -5,8 +5,8 @@
       "maxDuration": 60,
       "includeFiles": "data/personas.json"
     },
-    "api/**/*.js": {
-      "maxDuration": 15
+    "api/personas.js": {
+      "includeFiles": "data/personas.json"
     }
   }
 }

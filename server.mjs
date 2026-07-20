@@ -14,6 +14,7 @@ import { fileURLToPath } from 'node:url';
 
 import critiqueHandler from './api/critique.js';
 import statsHandler from './api/stats.js';
+import personasHandler from './api/personas.js';
 import signupHandler from './api/auth/signup.js';
 import loginHandler from './api/auth/login.js';
 import logoutHandler from './api/auth/logout.js';
@@ -36,6 +37,7 @@ const TYPES = {
 const API_HANDLERS = {
   '/api/critique': critiqueHandler,
   '/api/stats': statsHandler,
+  '/api/personas': personasHandler,
   '/api/auth/signup': signupHandler,
   '/api/auth/login': loginHandler,
   '/api/auth/logout': logoutHandler,

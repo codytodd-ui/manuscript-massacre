@@ -547,9 +547,19 @@
 
     // ---------- Boot ----------
     async function boot() {
+      // Wire the UI and auth FIRST so they work even if the roster fails to load.
+      renderModes();
+      wireInputs();
+      updateReadout();
+      loadStats();
+      refreshAuth();
+
+      // Load the mentor roster from the API (reliable on any host).
       try {
-        const res = await fetch('data/personas.json');
-        PERSONAS = await res.json();
+        const res = await fetch('api/personas');
+        const data = await res.json();
+        PERSONAS = Array.isArray(data) ? data : (data.personas || []);
+        if (!PERSONAS.length) throw new Error('empty roster');
       } catch (e) {
         showError('Could not load the mentor roster. If you opened this file directly, run it through the dev server (see README).');
         return;
@@ -557,13 +567,10 @@
       renderChips();
       renderGrid();
       renderModes();
-      wireInputs();
       restoreDraft();
-      renderModes();
       renderGrid();
+      renderModes();
       updateReadout();
-      loadStats();
-      refreshAuth();
     }
 
     // ---------- Critique counter ----------
