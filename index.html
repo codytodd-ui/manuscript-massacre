@@ -340,6 +340,8 @@
     }
     .savenote.nudge { background: var(--panel-2); border-color: var(--line); color: var(--muted); }
     .savenote a, .savenote button.linky { color: var(--accent-2); background: none; border: 0; font: inherit; font-weight: 700; cursor: pointer; padding: 0; }
+    .savenote .note-x { margin-left: auto; background: none; border: 0; color: var(--muted); font-size: 20px; line-height: 1; cursor: pointer; padding: 0 2px; }
+    .savenote .note-x:hover { color: var(--ink); }
 
     /* ---------- Export row ---------- */
     .exp-row { display: flex; gap: 8px; flex-wrap: wrap; }
@@ -818,18 +820,24 @@
       const results = document.getElementById('results');
       const head = results.querySelector('.results-head');
       if (!head) return;
+      // The sign-up prompt is optional and stays dismissed once closed.
+      if (kind === 'nudge') { try { if (localStorage.getItem('mm_hide_nudge') === '1') return; } catch {} }
       let html;
       if (kind === 'saved') {
         html = '<div class="savenote">✓ Saved to your dashboard. <button class="linky" id="note-dash">View dashboard →</button></div>';
       } else if (kind === 'error') {
-        html = '<div class="savenote nudge">Couldn’t save this to your dashboard — but here it is above.</div>';
+        html = '<div class="savenote nudge">Couldn’t save this to your dashboard — but it’s ready above.</div>';
       } else {
-        html = '<div class="savenote nudge">Want to keep this? <button class="linky" id="note-signup">Sign up</button> or <button class="linky" id="note-login">log in</button> to save it to your dashboard.</div>';
+        html = '<div class="savenote nudge"><span>No account needed — your critique is ready above. Optionally <button class="linky" id="note-signup">create a free account</button> to keep a history.</span>' +
+          '<button class="note-x" id="note-x" aria-label="Dismiss">×</button></div>';
       }
       head.insertAdjacentHTML('afterend', html);
       const d = document.getElementById('note-dash'); if (d) d.onclick = showDashboard;
       const s = document.getElementById('note-signup'); if (s) s.onclick = () => openAuth('signup');
-      const l = document.getElementById('note-login'); if (l) l.onclick = () => openAuth('login');
+      const x = document.getElementById('note-x'); if (x) x.onclick = (e) => {
+        const note = e.target.closest('.savenote'); if (note) note.remove();
+        try { localStorage.setItem('mm_hide_nudge', '1'); } catch {}
+      };
     }
 
     // ================= Shared result rendering =================
