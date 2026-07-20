@@ -23,19 +23,32 @@ plus 43 more.
 ## How it works
 
 - **Front end** — a single static `index.html` (no build step). Reads `.txt`, `.md`,
-  `.docx`, and `.pdf` uploads (DOCX/PDF parsed in-browser via CDN libraries), or plain paste.
-- **Back end** — one serverless function, [`api/critique.js`](api/critique.js), that
-  calls the Anthropic Messages API once per selected mentor (in parallel) and returns
-  each one's verdict, score, plain-English summary, and full critique.
-- **Data** — all 50 mentors and their critiquing profiles live in
-  [`data/personas.json`](data/personas.json).
-- **Critique counter** — a small site-wide counter of critiques delivered, shown under
-  the hero. `GET /api/stats` reads it, and every successful critique call increments
-  it. It's backed by a plain file ([`data/stats.json`](data/stats.json), created at
-  runtime, gitignored — see [`lib/stats.js`](lib/stats.js)), which persists fine on the
-  bundled `server.mjs` but may reset on cold starts on some serverless platforms.
+  `.docx`, and `.pdf` uploads (DOCX/PDF parsed in-browser via CDN libraries), or plain
+  paste. Critiques stream in per-mentor, and you can export any run as **PDF**,
+  **Markdown**, or copy it as text. Your draft (text, mentors, style) is remembered in
+  `localStorage`.
+- **Critique API** — [`api/critique.js`](api/critique.js) calls the Anthropic Messages
+  API for one mentor per request and returns its verdict, score, plain-English summary,
+  and full critique. It is IP **rate-limited**, retries transient upstream errors once,
+  and times out hung calls.
+- **Accounts & dashboard** — create an account and your critiques are saved to a
+  personal dashboard you can revisit, re-export, or delete. Auth endpoints:
+  `POST /api/auth/signup`, `POST /api/auth/login`, `POST /api/auth/logout`,
+  `GET /api/auth/me`; history: `GET/POST/DELETE /api/history`. Passwords are hashed with
+  scrypt; sessions are signed HttpOnly-cookie tokens ([`lib/auth.js`](lib/auth.js)).
+- **Data** — the 50 mentors live in [`data/personas.json`](data/personas.json). Users,
+  saved critiques, and the site-wide critique counter live in `data/db.json`, a plain
+  JSON file written through a small store ([`lib/store.js`](lib/store.js)). `GET /api/stats`
+  exposes the counter shown under the hero.
 
-A pure static page can't call an LLM, so this ships as a real app with a tiny backend.
+A pure static page can't call an LLM or hold accounts, so this ships as a real app with
+a small backend.
+
+> **Persistence caveat.** `data/db.json` persists on any long-lived Node process (the
+> bundled `server.mjs`), but on ephemeral/serverless filesystems (e.g. Vercel) it can
+> reset on cold starts — so accounts and history won't survive there. For production,
+> swap [`lib/store.js`](lib/store.js) for a real database (Postgres, Vercel KV, Upstash)
+> and use a shared rate-limit store; the rest of the app is unchanged.
 
 ## Run it locally
 
@@ -76,17 +89,23 @@ the [Vercel CLI](https://vercel.com/docs/cli) and a `.env.local`).
 
 ### Netlify
 
-Works too — move `api/critique.js` and `api/stats.js` (and `lib/stats.js`, adjusting
-their relative import) into `netlify/functions/`, change the front-end fetch URLs from
-`api/critique` / `api/stats` to `/.netlify/functions/critique` / `/.netlify/functions/stats`,
-and set `ANTHROPIC_API_KEY` in Netlify's environment variables.
+Works too, but takes more wiring: move each function under `api/` into
+`netlify/functions/` (keeping `lib/` importable), remap the front-end fetch URLs
+(`api/critique` → `/.netlify/functions/critique`, etc.), and set `ANTHROPIC_API_KEY` and
+`SESSION_SECRET`. As with Vercel, accounts/history need a real database rather than the
+bundled file store.
 
 ## Configuration
 
-| Env var             | Required | Default            | Purpose                          |
-| ------------------- | -------- | ------------------ | -------------------------------- |
-| `ANTHROPIC_API_KEY` | yes      | —                  | Auth for the Anthropic API       |
-| `ANTHROPIC_MODEL`   | no       | `claude-sonnet-5`  | Model used to generate critiques |
+| Env var             | Required | Default            | Purpose                                         |
+| ------------------- | -------- | ------------------ | ----------------------------------------------- |
+| `ANTHROPIC_API_KEY` | yes      | —                  | Auth for the Anthropic API                      |
+| `ANTHROPIC_MODEL`   | no       | `claude-sonnet-5`  | Model used to generate critiques                |
+| `SESSION_SECRET`    | no*      | insecure default   | HMAC secret that signs login session cookies    |
+
+\* Optional for local tinkering, but **set a strong random `SESSION_SECRET` for any real
+deployment** — otherwise session cookies are signed with a public default and could be
+forged. The server prints a warning when the default is in use.
 
 Manuscripts are truncated to the first ~30,000 characters per critique to keep
 token usage sane; the UI flags when this happens.
@@ -96,4 +115,6 @@ token usage sane; the UI flags when this happens.
 - Feedback is **AI-generated** in the spirit of each figure's known sensibility and
   style — not the real person, and not their actual opinions.
 - Each run makes up to 5 API calls (one per mentor). Watch your Anthropic usage.
-- Nothing is stored: text is sent to the function, critiqued, and returned.
+- Your manuscript text is sent to the API to be critiqued. If you're **not** signed in,
+  nothing is retained. If you **are** signed in, each run is saved to your dashboard
+  (in `data/db.json`) until you delete it.

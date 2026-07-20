@@ -2,7 +2,11 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "functions": {
     "api/critique.js": {
-      "maxDuration": 60
+      "maxDuration": 60,
+      "includeFiles": "data/personas.json"
+    },
+    "api/**/*.js": {
+      "maxDuration": 15
     }
   }
 }

@@ -1,10 +1,11 @@
 // Manuscript Mentors — GET /api/stats -> { totalCritiques }
-import { readStats } from '../lib/stats.js';
+import { getCounter } from '../lib/store.js';
 
-export default function handler(req, res) {
+export default async function handler(req, res) {
   if (req.method !== 'GET') {
     res.status(405).json({ error: 'Method not allowed. Use GET.' });
     return;
   }
-  res.status(200).json(readStats());
+  const totalCritiques = await getCounter();
+  res.status(200).json({ totalCritiques });
 }

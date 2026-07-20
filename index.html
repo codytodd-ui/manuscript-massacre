@@ -5,6 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Manuscript Mentors — thoughtful feedback from fifty great minds</title>
   <meta name="description" content="Paste or upload your writing, choose up to 5 of 50 great mentors, and pick how you'd like to be read: tough love, a balanced critique, a kind encouraging read, a craft breakdown, or a deep thematic analysis." />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23141110'/%3E%3Ctext x='16' y='23' font-size='20' text-anchor='middle' fill='%23cf9a3f' font-family='Georgia,serif' font-weight='bold'%3EM%3C/text%3E%3C/svg%3E" />
+  <meta property="og:title" content="Manuscript Mentors" />
+  <meta property="og:description" content="Hand your writing to up to 5 of 50 great minds — and choose exactly how you'd like to be mentored." />
+  <meta property="og:type" content="website" />
+  <meta name="twitter:card" content="summary" />
   <!-- Optional document parsers (loaded from CDN; only needed for .docx / .pdf uploads). -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js" defer></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js" defer></script>
@@ -287,10 +292,111 @@
       .summary-list li { gap: 10px; }
       .sl-body { font-size: 14.5px; }
     }
+
+    /* ---------- Top bar / account ---------- */
+    .topbar { display: flex; justify-content: flex-end; align-items: center; gap: 10px; padding: 16px 0 0; min-height: 34px; }
+    .topbar .link-btn {
+      border: 1px solid var(--line); background: var(--panel-2); color: var(--ink); font: inherit; font-weight: 600;
+      font-size: 13.5px; padding: 8px 14px; border-radius: 9px; cursor: pointer;
+    }
+    .topbar .link-btn:hover { border-color: #55462e; }
+    .topbar .link-btn.primary { background: var(--accent); color: #241900; border-color: var(--accent); }
+    .topbar .whoami { color: var(--muted); font-size: 13.5px; }
+    .topbar .whoami b { color: var(--ink); }
+
+    /* Keyboard focus visibility for selectable cards */
+    .pcard:focus-visible, .mode:focus-visible, .link-btn:focus-visible,
+    .pdfbtn:focus-visible, .exp-btn:focus-visible, .hist-item:focus-visible { outline: 2px solid var(--accent-2); outline-offset: 2px; }
+
+    /* ---------- Auth modal ---------- */
+    .modal-scrim {
+      position: fixed; inset: 0; background: rgba(8,7,5,.72); backdrop-filter: blur(3px);
+      display: flex; align-items: center; justify-content: center; padding: 20px; z-index: 50;
+    }
+    .modal {
+      width: 100%; max-width: 400px; background: linear-gradient(180deg, var(--panel), var(--bg-2));
+      border: 1px solid var(--line); border-radius: 16px; padding: 26px; box-shadow: var(--shadow);
+    }
+    .modal h3 { font-family: var(--serif); font-size: 24px; margin: 0 0 4px; }
+    .modal .msub { color: var(--muted); font-size: 14px; margin: 0 0 18px; }
+    .modal .tabs { width: 100%; display: flex; margin-bottom: 16px; }
+    .modal .tab { flex: 1; text-align: center; }
+    .field { margin-bottom: 12px; }
+    .field label { display: block; font-size: 12.5px; color: var(--muted); margin-bottom: 5px; font-weight: 600; }
+    .field input {
+      width: 100%; background: #100d09; border: 1px solid var(--line); color: var(--ink);
+      border-radius: 10px; padding: 11px 13px; font: inherit; font-size: 16px;
+    }
+    .field input:focus { outline: 2px solid var(--accent); }
+    .modal .slay { width: 100%; margin-top: 6px; }
+    .modal .modal-err { color: var(--blood-2, #e23b4a); font-size: 13.5px; min-height: 18px; margin: 4px 0 0; }
+    .modal-close { float: right; background: none; border: 0; color: var(--faint); font-size: 22px; cursor: pointer; line-height: 1; margin: -6px -6px 0 0; }
+
+    /* ---------- Save note ---------- */
+    .savenote {
+      display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+      background: #16201a; border: 1px solid var(--sage); color: #d6ead9;
+      padding: 10px 14px; border-radius: 10px; margin-top: 16px; font-size: 13.5px;
+    }
+    .savenote.nudge { background: var(--panel-2); border-color: var(--line); color: var(--muted); }
+    .savenote a, .savenote button.linky { color: var(--accent-2); background: none; border: 0; font: inherit; font-weight: 700; cursor: pointer; padding: 0; }
+
+    /* ---------- Export row ---------- */
+    .exp-row { display: flex; gap: 8px; flex-wrap: wrap; }
+    .exp-btn {
+      border: 1px solid var(--accent); background: transparent; color: var(--accent-2); cursor: pointer;
+      font: inherit; font-weight: 700; font-size: 13px; padding: 8px 13px; border-radius: 9px; white-space: nowrap;
+    }
+    .exp-btn:hover { background: rgba(207,154,63,.12); }
+    .exp-btn.copied { border-color: var(--sage); color: var(--sage); }
+
+    /* ---------- Char warning ---------- */
+    .charwarn { color: var(--accent); }
+
+    /* ---------- Loading skeleton ---------- */
+    .rcard.pending { opacity: .8; }
+    .skel-line { height: 11px; border-radius: 5px; background: linear-gradient(90deg, #241d14, #2f2618, #241d14); background-size: 200% 100%; animation: shimmer 1.3s linear infinite; margin: 8px 0; }
+    .skel-line.short { width: 40%; }
+    @keyframes shimmer { to { background-position: -200% 0; } }
+    .mini-spin { width: 16px; height: 16px; border-radius: 50%; border: 2px solid var(--line); border-top-color: var(--accent-2); animation: spin 1s linear infinite; display: inline-block; vertical-align: middle; }
+
+    /* ---------- Dashboard ---------- */
+    .dash-head { display: flex; align-items: baseline; justify-content: space-between; gap: 14px; flex-wrap: wrap; margin: 8px 0 6px; }
+    .dash-head h2 { font-family: var(--serif); font-size: 30px; margin: 0; }
+    .dash-sub { color: var(--muted); font-size: 14px; }
+    .hist-empty { text-align: center; color: var(--muted); padding: 46px 20px; }
+    .hist-item {
+      background: linear-gradient(180deg, var(--panel), var(--bg-2)); border: 1px solid var(--line);
+      border-radius: 14px; padding: 18px 20px; margin-top: 14px; box-shadow: var(--shadow);
+    }
+    .hist-top { display: flex; align-items: center; gap: 14px; cursor: pointer; }
+    .hist-score { flex: none; width: 52px; height: 52px; border-radius: 12px; display: grid; place-items: center; background: #17130c; border: 2px solid var(--accent); }
+    .hist-score .n { font-family: var(--serif); font-weight: 800; font-size: 20px; }
+    .hist-meta { flex: 1; min-width: 0; }
+    .hist-mode { font-family: var(--serif); font-size: 18px; font-weight: 700; }
+    .hist-when { color: var(--faint); font-size: 12.5px; }
+    .hist-names { color: var(--muted); font-size: 13px; margin-top: 3px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .hist-caret { color: var(--faint); font-size: 13px; flex: none; }
+    .hist-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px; }
+    .hist-excerpt { color: var(--muted); font-style: italic; font-family: var(--serif); border-left: 3px solid var(--line); padding-left: 12px; margin: 14px 0; font-size: 14.5px; }
+    .hist-body { margin-top: 8px; }
+    .danger { border-color: #5a2d28 !important; color: #e08a7c !important; }
+    .danger:hover { background: rgba(224,138,124,.1) !important; }
+
+    @media (max-width: 640px) {
+      .topbar { padding-top: 12px; }
+      .topbar .whoami { display: none; }
+      .exp-row .exp-btn { flex: 1; text-align: center; }
+      .dash-head h2 { font-size: 24px; }
+      .hist-names { white-space: normal; }
+    }
   </style>
 </head>
 <body>
   <div class="wrap">
+    <div class="topbar" id="topbar"></div>
+
+    <div id="view-app">
     <header class="hero">
       <div class="kicker">Guidance from fifty great minds</div>
       <h1 class="title">Manuscript Mentors</h1>
@@ -367,10 +473,52 @@
 
     <!-- RESULTS -->
     <div id="results"></div>
+    </div><!-- /view-app -->
+
+    <!-- DASHBOARD -->
+    <div id="view-dashboard" hidden>
+      <div class="dash-head">
+        <div>
+          <h2>Your critique history</h2>
+          <div class="dash-sub" id="dash-sub"></div>
+        </div>
+        <button class="link-btn primary" id="dash-new">✍️ New critique</button>
+      </div>
+      <div id="hist-list"></div>
+    </div>
 
     <footer>
       Manuscript Mentors · 50 mentors, 5 perspectives, one better draft · Feedback is AI-generated in the spirit of each figure's known sensibility, not the real person.
     </footer>
+
+    <!-- AUTH MODAL -->
+    <div class="modal-scrim" id="auth-modal" hidden>
+      <div class="modal" role="dialog" aria-modal="true" aria-labelledby="auth-title">
+        <button class="modal-close" id="auth-close" aria-label="Close">×</button>
+        <div class="tabs" role="tablist">
+          <button class="tab active" id="auth-tab-login" role="tab">Log in</button>
+          <button class="tab" id="auth-tab-signup" role="tab">Sign up</button>
+        </div>
+        <h3 id="auth-title">Welcome back</h3>
+        <p class="msub" id="auth-msub">Log in to save critiques to your dashboard.</p>
+        <form id="auth-form">
+          <div class="field" id="field-name" hidden>
+            <label for="auth-name">Name</label>
+            <input id="auth-name" type="text" autocomplete="name" placeholder="What should we call you?" />
+          </div>
+          <div class="field">
+            <label for="auth-email">Email</label>
+            <input id="auth-email" type="email" autocomplete="email" placeholder="you@example.com" required />
+          </div>
+          <div class="field">
+            <label for="auth-password">Password</label>
+            <input id="auth-password" type="password" autocomplete="current-password" placeholder="At least 8 characters" required />
+          </div>
+          <p class="modal-err" id="auth-err"></p>
+          <button type="submit" class="slay" id="auth-submit">Log in</button>
+        </form>
+      </div>
+    </div>
   </div>
 
   <script>
@@ -391,7 +539,11 @@
     let activeCategory = 'All';
     let searchTerm = '';
     let selectedMode = null;
-    let lastRun = null; // { mode, truncated, results, words } — kept for the PDF export
+    let lastRun = null; // { mode, truncated, results, words } — kept for export
+    let currentUser = null; // { id, email, name } when signed in
+    let running = false;
+    const DRAFT_KEY = 'mm_draft_v1';
+    const MAX_CHARS = 30000;
 
     // ---------- Boot ----------
     async function boot() {
@@ -406,8 +558,12 @@
       renderGrid();
       renderModes();
       wireInputs();
+      restoreDraft();
+      renderModes();
+      renderGrid();
       updateReadout();
       loadStats();
+      refreshAuth();
     }
 
     // ---------- Critique counter ----------
@@ -433,6 +589,395 @@
       el.hidden = false;
     }
 
+    // ================= Draft persistence =================
+    let restoring = false;
+    let historyCache = [];
+
+    function saveDraft() {
+      if (restoring) return;
+      try {
+        localStorage.setItem(DRAFT_KEY, JSON.stringify({
+          text: manuscriptText, selected: Array.from(selected), mode: selectedMode,
+        }));
+      } catch { /* storage unavailable */ }
+    }
+    function restoreDraft() {
+      let d = null;
+      try { d = JSON.parse(localStorage.getItem(DRAFT_KEY) || 'null'); } catch { d = null; }
+      if (!d) return;
+      restoring = true;
+      if (typeof d.text === 'string' && d.text) {
+        manuscriptText = d.text;
+        document.getElementById('manuscript').value = d.text;
+        switchTab('paste');
+        onTextChanged();
+      }
+      if (Array.isArray(d.selected)) {
+        d.selected.filter(id => PERSONAS.some(p => p.id === id)).slice(0, MAX_PICKS).forEach(id => selected.add(id));
+      }
+      if (d.mode && MODES.some(m => m.key === d.mode)) selectedMode = d.mode;
+      restoring = false;
+      saveDraft();
+    }
+    function clientWords() {
+      return manuscriptText.trim() ? manuscriptText.trim().split(/\s+/).length : 0;
+    }
+
+    // ================= Auth =================
+    async function refreshAuth() {
+      try {
+        const res = await fetch('api/auth/me');
+        if (res.ok) { const d = await res.json(); currentUser = d.user; }
+      } catch { /* offline / no backend */ }
+      renderTopbar();
+    }
+    function renderTopbar() {
+      const el = document.getElementById('topbar');
+      if (currentUser) {
+        el.innerHTML =
+          '<span class="whoami">Hi, <b>' + escapeHtml(currentUser.name) + '</b></span>' +
+          '<button class="link-btn" id="nav-dash">📚 Dashboard</button>' +
+          '<button class="link-btn" id="nav-logout">Log out</button>';
+        document.getElementById('nav-dash').onclick = showDashboard;
+        document.getElementById('nav-logout').onclick = doLogout;
+      } else {
+        el.innerHTML =
+          '<button class="link-btn" id="nav-login">Log in</button>' +
+          '<button class="link-btn primary" id="nav-signup">Sign up</button>';
+        document.getElementById('nav-login').onclick = () => openAuth('login');
+        document.getElementById('nav-signup').onclick = () => openAuth('signup');
+      }
+    }
+    let authMode = 'login';
+    function openAuth(mode) {
+      setAuthMode(mode || 'login');
+      document.getElementById('auth-err').textContent = '';
+      document.getElementById('auth-modal').hidden = false;
+      setTimeout(() => document.getElementById('auth-email').focus(), 30);
+    }
+    function closeAuth() { document.getElementById('auth-modal').hidden = true; }
+    function setAuthMode(mode) {
+      authMode = mode;
+      const login = mode === 'login';
+      document.getElementById('auth-tab-login').classList.toggle('active', login);
+      document.getElementById('auth-tab-signup').classList.toggle('active', !login);
+      document.getElementById('field-name').hidden = login;
+      document.getElementById('auth-title').textContent = login ? 'Welcome back' : 'Create your account';
+      document.getElementById('auth-msub').textContent = login
+        ? 'Log in to see your saved critiques.'
+        : 'Sign up to save critiques to your dashboard.';
+      document.getElementById('auth-submit').textContent = login ? 'Log in' : 'Sign up';
+      document.getElementById('auth-password').setAttribute('autocomplete', login ? 'current-password' : 'new-password');
+      document.getElementById('auth-err').textContent = '';
+    }
+    async function submitAuth(e) {
+      e.preventDefault();
+      const errEl = document.getElementById('auth-err');
+      const submit = document.getElementById('auth-submit');
+      const email = document.getElementById('auth-email').value.trim();
+      const password = document.getElementById('auth-password').value;
+      const name = document.getElementById('auth-name').value.trim();
+      errEl.textContent = '';
+      if (authMode === 'signup' && password.length < 8) { errEl.textContent = 'Password must be at least 8 characters.'; return; }
+      submit.disabled = true; submit.textContent = 'Please wait…';
+      try {
+        const url = authMode === 'login' ? 'api/auth/login' : 'api/auth/signup';
+        const res = await fetch(url, {
+          method: 'POST', headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ email, password, name }),
+        });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) { errEl.textContent = data.error || 'Something went wrong.'; return; }
+        currentUser = data.user;
+        renderTopbar();
+        closeAuth();
+        document.getElementById('auth-form').reset();
+      } catch {
+        errEl.textContent = 'Could not reach the server.';
+      } finally {
+        submit.disabled = false; submit.textContent = authMode === 'login' ? 'Log in' : 'Sign up';
+      }
+    }
+    async function doLogout() {
+      try { await fetch('api/auth/logout', { method: 'POST' }); } catch {}
+      currentUser = null;
+      renderTopbar();
+      showApp();
+    }
+
+    // ================= Views =================
+    function showDashboard() {
+      document.getElementById('view-app').hidden = true;
+      document.getElementById('view-dashboard').hidden = false;
+      window.scrollTo({ top: 0 });
+      loadHistory();
+    }
+    function showApp() {
+      document.getElementById('view-dashboard').hidden = true;
+      document.getElementById('view-app').hidden = false;
+    }
+
+    // ================= Dashboard / history =================
+    async function loadHistory() {
+      const list = document.getElementById('hist-list');
+      const sub = document.getElementById('dash-sub');
+      list.innerHTML = '<div class="hist-empty"><span class="mini-spin"></span> Loading…</div>';
+      try {
+        const res = await fetch('api/history');
+        if (res.status === 401) { currentUser = null; renderTopbar(); showApp(); openAuth('login'); return; }
+        const data = await res.json();
+        historyCache = data.critiques || [];
+        sub.textContent = historyCache.length ? (historyCache.length + ' saved critique' + (historyCache.length === 1 ? '' : 's')) : '';
+        renderHistory();
+      } catch {
+        list.innerHTML = '<div class="hist-empty">Could not load your history.</div>';
+      }
+    }
+    function renderHistory() {
+      const list = document.getElementById('hist-list');
+      if (!historyCache.length) {
+        list.innerHTML = '<div class="hist-empty">No saved critiques yet.<br>Run a critique and it will show up here.</div>';
+        return;
+      }
+      list.innerHTML = historyCache.map(rec => {
+        const avg = rec.avgScore;
+        const names = (rec.results || []).map(r => r.name).join(' · ');
+        const when = new Date(rec.createdAt).toLocaleString();
+        const ring = avg != null ? scoreColor(avg) : 'var(--line)';
+        const num = avg != null ? scoreColor(avg) : 'var(--faint)';
+        return '<div class="hist-item" data-id="' + rec.id + '">' +
+          '<div class="hist-top" data-toggle="' + rec.id + '" role="button" tabindex="0" aria-expanded="false">' +
+            '<div class="hist-score" style="border-color:' + ring + '"><div class="n" style="color:' + num + '">' + (avg != null ? avg : '—') + '</div></div>' +
+            '<div class="hist-meta"><div class="hist-mode">' + escapeHtml(rec.mode || 'Critique') + '</div>' +
+              '<div class="hist-when">' + escapeHtml(when) + '</div>' +
+              '<div class="hist-names">' + escapeHtml(names) + '</div></div>' +
+            '<div class="hist-caret">▾</div>' +
+          '</div>' +
+          '<div class="hist-body" id="hb-' + rec.id + '" hidden></div>' +
+        '</div>';
+      }).join('');
+      list.querySelectorAll('.hist-top').forEach(t => {
+        const id = t.dataset.toggle;
+        t.addEventListener('click', () => toggleHist(id, t));
+        t.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleHist(id, t); } });
+      });
+    }
+    function toggleHist(id, topEl) {
+      const body = document.getElementById('hb-' + id);
+      const rec = historyCache.find(r => r.id === id);
+      if (!body || !rec) return;
+      if (!body.hidden) { body.hidden = true; body.innerHTML = ''; if (topEl) topEl.setAttribute('aria-expanded', 'false'); return; }
+      const run = { mode: rec.mode, results: rec.results || [], words: rec.wordCount, truncated: rec.truncated, createdAt: rec.createdAt };
+      let h = '';
+      if (rec.excerpt) h += '<div class="hist-excerpt">“' + escapeHtml(rec.excerpt) + (rec.excerpt.length >= 240 ? '…' : '') + '”</div>';
+      h += '<div class="hist-actions">' + exportButtonsHtml() + '<button class="exp-btn danger" data-del="' + id + '">🗑 Delete</button></div>';
+      h += staticResultsHtml(run);
+      body.innerHTML = h;
+      body.hidden = false;
+      if (topEl) topEl.setAttribute('aria-expanded', 'true');
+      body.querySelectorAll('.exp-btn[data-exp]').forEach(b => b.addEventListener('click', () => handleExport(b.dataset.exp, run, b)));
+      const del = body.querySelector('.exp-btn[data-del]');
+      if (del) del.addEventListener('click', () => deleteHist(id));
+    }
+    async function deleteHist(id) {
+      if (!confirm('Delete this critique from your history? This cannot be undone.')) return;
+      try {
+        const res = await fetch('api/history', { method: 'DELETE', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ id }) });
+        if (res.ok) {
+          historyCache = historyCache.filter(r => r.id !== id);
+          document.getElementById('dash-sub').textContent = historyCache.length ? (historyCache.length + ' saved critique' + (historyCache.length === 1 ? '' : 's')) : '';
+          renderHistory();
+        }
+      } catch { /* ignore */ }
+    }
+
+    // ================= Save a run to history =================
+    async function saveToHistory(run) {
+      const res = await fetch('api/history', {
+        method: 'POST', headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({
+          mode: run.mode, wordCount: run.words, truncated: run.truncated,
+          excerpt: manuscriptText.slice(0, 240),
+          avgScore: averageScore(run.results),
+          results: run.results.map(r => ({
+            id: r.id, name: r.name, tag: r.tag, verdict: r.verdict, score: r.score,
+            summary: r.summary, critique: r.critique, error: r.error || undefined,
+          })),
+        }),
+      });
+      return res.ok;
+    }
+    function showSaveNote(kind) {
+      const results = document.getElementById('results');
+      const head = results.querySelector('.results-head');
+      if (!head) return;
+      let html;
+      if (kind === 'saved') {
+        html = '<div class="savenote">✓ Saved to your dashboard. <button class="linky" id="note-dash">View dashboard →</button></div>';
+      } else if (kind === 'error') {
+        html = '<div class="savenote nudge">Couldn’t save this to your dashboard — but here it is above.</div>';
+      } else {
+        html = '<div class="savenote nudge">Want to keep this? <button class="linky" id="note-signup">Sign up</button> or <button class="linky" id="note-login">log in</button> to save it to your dashboard.</div>';
+      }
+      head.insertAdjacentHTML('afterend', html);
+      const d = document.getElementById('note-dash'); if (d) d.onclick = showDashboard;
+      const s = document.getElementById('note-signup'); if (s) s.onclick = () => openAuth('signup');
+      const l = document.getElementById('note-login'); if (l) l.onclick = () => openAuth('login');
+    }
+
+    // ================= Shared result rendering =================
+    function avgRingHtml(avg) {
+      if (avg == null) return '';
+      return '<div class="avgring" style="border-color:' + scoreColor(avg) + '">' +
+        '<div><div class="n" style="color:' + scoreColor(avg) + '">' + avg + '</div><div class="l">avg / 100</div></div></div>';
+    }
+    function summaryListHtml(results) {
+      return (results || []).map(r => {
+        if (r.pending) {
+          return '<li><span class="sl-score" style="background:var(--faint)"><span class="mini-spin"></span></span>' +
+            '<div class="sl-body"><span class="sl-name">' + escapeHtml(r.name) + '</span> — <span class="sl-take" style="color:var(--faint)">reading…</span></div></li>';
+        }
+        const take = r.error ? r.error : (r.summary || r.verdict || '—');
+        const badge = typeof r.score === 'number'
+          ? '<span class="sl-score" style="background:' + scoreColor(r.score) + '">' + r.score + '</span>'
+          : '<span class="sl-score" style="background:var(--faint)">—</span>';
+        return '<li>' + badge + '<div class="sl-body"><span class="sl-name">' + escapeHtml(r.name) + '</span> — ' +
+          '<span class="sl-take">' + escapeHtml(take) + '</span></div></li>';
+      }).join('');
+    }
+    function detailInner(r) {
+      let h = '<div class="rtop"><div class="avatar" style="background:' + colorFor(r.id) + '">' + initials(r.name) + '</div>' +
+        '<div><div class="rname">' + escapeHtml(r.name) + '</div><div class="rtag">' + escapeHtml(r.tag || '') + '</div></div>';
+      if (!r.pending && typeof r.score === 'number') {
+        h += '<div class="rscore"><div class="num" style="color:' + scoreColor(r.score) + '">' + r.score + '</div><div class="lbl">/ 100</div></div>';
+      }
+      h += '</div>';
+      if (r.pending) {
+        return h + '<div style="margin-top:14px"><span class="mini-spin"></span> <span style="color:var(--faint);font-size:13px">reading your work…</span>' +
+          '<div class="skel-line"></div><div class="skel-line"></div><div class="skel-line short"></div></div>';
+      }
+      if (r.error) return h + '<p class="rerr">' + escapeHtml(r.error) + '</p>';
+      if (r.verdict) h += '<div class="verdict">“' + escapeHtml(r.verdict) + '”</div>';
+      return h + '<div class="critique">' + renderMarkdown(r.critique || '') + '</div>';
+    }
+    function staticResultsHtml(run) {
+      const avg = averageScore(run.results);
+      let h = '<div class="rcard summary-card"><div class="summary-top">' + avgRingHtml(avg) +
+        '<div class="summary-headrow"><div><h3>In short</h3><div class="sub">A plain-English take from each mentor.</div></div></div></div>' +
+        '<ul class="summary-list">' + summaryListHtml(run.results) + '</ul></div>';
+      (run.results || []).forEach(r => { h += '<div class="rcard">' + detailInner(r) + '</div>'; });
+      return h;
+    }
+
+    // ================= Exports =================
+    function exportButtonsHtml() {
+      return '<button class="exp-btn" data-exp="pdf">⬇ PDF</button>' +
+        '<button class="exp-btn" data-exp="md">⬇ Markdown</button>' +
+        '<button class="exp-btn" data-exp="copy">⧉ Copy text</button>';
+    }
+    function handleExport(kind, run, btn) {
+      if (!run) return;
+      if (kind === 'pdf') buildPdf(run);
+      else if (kind === 'md') downloadFile('manuscript-mentors-critique.md', buildMarkdown(run), 'text/markdown');
+      else if (kind === 'copy') copyText(buildPlainText(run), btn);
+    }
+    function runWords(run) { return run.words != null ? run.words : (run.wordCount || 0); }
+    function runDate(run) { return run.createdAt ? new Date(run.createdAt) : new Date(); }
+    function buildPlainText(run) {
+      const avg = averageScore(run.results);
+      const L = ['MANUSCRIPT MENTORS'];
+      L.push([run.mode, runWords(run) ? runWords(run).toLocaleString() + ' words' : null, runDate(run).toLocaleDateString()].filter(Boolean).join('  ·  '));
+      if (avg != null) L.push('Average score: ' + avg + ' / 100');
+      L.push('', 'IN SHORT');
+      run.results.forEach(r => L.push('• ' + r.name + ' — ' + (typeof r.score === 'number' ? r.score + '/100' : '—') + ': ' + (r.error || r.summary || r.verdict || '—')));
+      L.push('', 'FULL CRITIQUES');
+      run.results.forEach(r => {
+        L.push('', r.name + (typeof r.score === 'number' ? '  ·  ' + r.score + '/100' : ''));
+        if (r.error) { L.push(r.error); return; }
+        if (r.verdict) L.push('“' + r.verdict + '”');
+        L.push(String(r.critique || '').replace(/\*\*/g, ''));
+      });
+      L.push('', 'Feedback is AI-generated in the spirit of each figure’s known sensibility, not the real person.');
+      return L.join('\n');
+    }
+    function buildMarkdown(run) {
+      const avg = averageScore(run.results);
+      const L = ['# Manuscript Mentors', ''];
+      L.push('*' + [run.mode, runWords(run) ? runWords(run).toLocaleString() + ' words' : null, runDate(run).toLocaleDateString()].filter(Boolean).join(' · ') + '*', '');
+      if (avg != null) L.push('**Average score: ' + avg + ' / 100**', '');
+      L.push('## In short', '');
+      run.results.forEach(r => L.push('- **' + r.name + '** (' + (typeof r.score === 'number' ? r.score + '/100' : '—') + '): ' + (r.error || r.summary || r.verdict || '—')));
+      L.push('', '## Full critiques', '');
+      run.results.forEach(r => {
+        L.push('### ' + r.name + (typeof r.score === 'number' ? ' — ' + r.score + '/100' : ''));
+        if (r.error) { L.push('', r.error, ''); return; }
+        if (r.verdict) L.push('', '> ' + r.verdict);
+        L.push('', String(r.critique || ''), '');
+      });
+      L.push('---', '', '*Feedback is AI-generated in the spirit of each figure’s known sensibility, not the real person.*');
+      return L.join('\n');
+    }
+    function downloadFile(name, content, mime) {
+      const blob = new Blob([content], { type: mime + ';charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = name;
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    }
+    async function copyText(text, btn) {
+      try {
+        await navigator.clipboard.writeText(text);
+        if (btn) { const t = btn.textContent; btn.textContent = '✓ Copied'; btn.classList.add('copied'); setTimeout(() => { btn.textContent = t; btn.classList.remove('copied'); }, 1600); }
+      } catch {
+        showError('Copy failed — your browser blocked clipboard access.');
+      }
+    }
+    function buildPdf(run) {
+      if (!(window.jspdf && window.jspdf.jsPDF)) { showError('PDF library still loading — give it a second and try again.'); return; }
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF({ unit: 'pt', format: 'a4' });
+      const W = doc.internal.pageSize.getWidth();
+      const H = doc.internal.pageSize.getHeight();
+      const M = 48;
+      let y = M;
+      function ensure(space) { if (y + space > H - M) { doc.addPage(); y = M; } }
+      function write(txt, opts) {
+        opts = opts || {};
+        const size = opts.size || 11, style = opts.style || 'normal', color = opts.color || [45, 40, 32];
+        const gapAfter = opts.gapAfter == null ? 10 : opts.gapAfter, indent = opts.indent || 0;
+        doc.setFont('helvetica', style); doc.setFontSize(size); doc.setTextColor(color[0], color[1], color[2]);
+        const lineH = size * 1.32;
+        doc.splitTextToSize(String(txt), W - 2 * M - indent).forEach(ln => { ensure(lineH); doc.text(ln, M + indent, y); y += lineH; });
+        y += gapAfter;
+      }
+      function rule() { ensure(14); doc.setDrawColor(210, 200, 185); doc.line(M, y, W - M, y); y += 14; }
+      const avg = averageScore(run.results);
+      write('Manuscript Mentors', { size: 24, style: 'bold', color: [150, 110, 40], gapAfter: 4 });
+      write([run.mode, runWords(run) ? runWords(run).toLocaleString() + ' words' : null, runDate(run).toLocaleDateString()].filter(Boolean).join('   ·   '), { size: 10, color: [130, 125, 115], gapAfter: 14 });
+      if (avg != null) write('Average score:  ' + avg + ' / 100', { size: 15, style: 'bold', color: [40, 40, 40], gapAfter: 6 });
+      if (run.truncated) write('(Only the first ~30,000 characters were read.)', { size: 9, color: [150, 145, 135], gapAfter: 10 });
+      rule();
+      write('In short', { size: 15, style: 'bold', color: [40, 40, 40], gapAfter: 8 });
+      run.results.forEach(r => {
+        write(r.name + '  —  ' + (typeof r.score === 'number' ? r.score + '/100' : '—'), { size: 11, style: 'bold', color: [30, 30, 30], gapAfter: 2 });
+        write(r.error ? r.error : (r.summary || r.verdict || '—'), { size: 10, color: [80, 75, 68], gapAfter: 10, indent: 10 });
+      });
+      rule();
+      write('Full critiques', { size: 15, style: 'bold', color: [40, 40, 40], gapAfter: 10 });
+      run.results.forEach(r => {
+        ensure(60);
+        write(r.name + (typeof r.score === 'number' ? '  ·  ' + r.score + '/100' : ''), { size: 14, style: 'bold', color: [25, 25, 25], gapAfter: 2 });
+        if (r.tag) write(r.tag, { size: 9, color: [140, 135, 125], gapAfter: 6 });
+        if (r.error) { write(r.error, { size: 10.5, color: [160, 60, 40], gapAfter: 18 }); return; }
+        if (r.verdict) write('“' + r.verdict + '”', { size: 11.5, style: 'italic', color: [110, 85, 35], gapAfter: 8 });
+        write(String(r.critique || '').replace(/\*\*/g, '').replace(/^[-*•]\s+/gm, '•  '), { size: 10.5, color: [45, 42, 36], gapAfter: 18 });
+      });
+      rule();
+      write('Feedback is AI-generated in the spirit of each figure’s known sensibility, not the real person.', { size: 8, color: [160, 155, 145], gapAfter: 0 });
+      doc.save('manuscript-mentors-critique.pdf');
+    }
+
     // ---------- Step 1: input ----------
     function wireInputs() {
       const ta = document.getElementById('manuscript');
@@ -452,6 +997,17 @@
 
       document.getElementById('search').addEventListener('input', (e) => { searchTerm = e.target.value.toLowerCase(); renderGrid(); });
       document.getElementById('slay').addEventListener('click', runCritique);
+
+      // Auth modal
+      document.getElementById('auth-close').addEventListener('click', closeAuth);
+      document.getElementById('auth-tab-login').addEventListener('click', () => setAuthMode('login'));
+      document.getElementById('auth-tab-signup').addEventListener('click', () => setAuthMode('signup'));
+      document.getElementById('auth-form').addEventListener('submit', submitAuth);
+      document.getElementById('auth-modal').addEventListener('click', (e) => { if (e.target.id === 'auth-modal') closeAuth(); });
+      document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !document.getElementById('auth-modal').hidden) closeAuth(); });
+
+      // Dashboard
+      document.getElementById('dash-new').addEventListener('click', showApp);
     }
 
     function switchTab(which) {
@@ -462,9 +1018,14 @@
     }
 
     function onTextChanged() {
-      const words = manuscriptText.trim() ? manuscriptText.trim().split(/\s+/).length : 0;
-      document.getElementById('wordcount').textContent = words.toLocaleString() + ' words';
+      const words = clientWords();
+      const wc = document.getElementById('wordcount');
+      wc.innerHTML = words.toLocaleString() + ' words' +
+        (manuscriptText.length > MAX_CHARS
+          ? ' · <span class="charwarn">only the first ' + MAX_CHARS.toLocaleString() + ' characters will be read</span>'
+          : '');
       updateReadout();
+      saveDraft();
     }
 
     async function readFile(file) {
@@ -543,6 +1104,9 @@
         const card = document.createElement('div');
         card.className = 'pcard' + (selected.has(p.id) ? ' selected' : '') + (atMax ? ' disabled' : '');
         card.setAttribute('role', 'button');
+        card.tabIndex = atMax ? -1 : 0;
+        card.setAttribute('aria-pressed', selected.has(p.id) ? 'true' : 'false');
+        card.setAttribute('aria-label', p.name + ' — ' + p.tagline);
         card.innerHTML =
           '<div class="check">✓</div>' +
           '<div class="avatar" style="background:' + colorFor(p.id) + '">' + initials(p.name) + '</div>' +
@@ -551,6 +1115,7 @@
           '<div class="pline">' + escapeHtml(p.tagline) + '</div>' +
           '<span class="pcat">' + escapeHtml(p.category) + '</span></div>';
         card.onclick = () => togglePersona(p.id, atMax);
+        card.onkeydown = (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); togglePersona(p.id, atMax); } };
         grid.appendChild(card);
       });
     }
@@ -559,6 +1124,7 @@
       else { if (atMax) return; selected.add(id); }
       renderGrid();
       updateReadout();
+      saveDraft();
     }
 
     // ---------- Step 3: modes ----------
@@ -568,8 +1134,13 @@
       MODES.forEach(m => {
         const d = document.createElement('div');
         d.className = 'mode' + (selectedMode === m.key ? ' selected' : '');
+        d.setAttribute('role', 'button');
+        d.tabIndex = 0;
+        d.setAttribute('aria-pressed', selectedMode === m.key ? 'true' : 'false');
         d.innerHTML = '<div class="emoji">' + m.emoji + '</div><div class="mname">' + m.name + '</div><div class="mdesc">' + m.desc + '</div>';
-        d.onclick = () => { selectedMode = m.key; renderModes(); updateReadout(); };
+        const pick = () => { selectedMode = m.key; renderModes(); updateReadout(); saveDraft(); };
+        d.onclick = pick;
+        d.onkeydown = (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); pick(); } };
         el.appendChild(d);
       });
     }
@@ -588,42 +1159,68 @@
 
     // ---------- Run ----------
     async function runCritique() {
+      if (running) return;
       showError('');
+      running = true;
       const btn = document.getElementById('slay');
       btn.disabled = true;
-      const results = document.getElementById('results');
-      const chosen = PERSONAS.filter(p => selected.has(p.id));
-      results.innerHTML =
-        '<div class="rcard loading"><div class="spinner"></div>' +
-        '<div class="loadmsg">Your mentors are reading your work…<br><span style="color:var(--faint);font-size:13px">' +
-        chosen.map(p => p.name).join(' · ') + '</span></div></div>';
-      results.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
-      try {
-        const res = await fetch('api/critique', {
-          method: 'POST',
-          headers: { 'content-type': 'application/json' },
-          body: JSON.stringify({ text: manuscriptText, personaIds: Array.from(selected), mode: selectedMode }),
-        });
-        let data;
-        try {
-          data = await res.json();
-        } catch {
-          throw new Error(
-            res.status === 404
-              ? 'The critique backend isn’t running. Serve this app with `vercel dev` or deploy it (see the README) so /api/critique is available.'
-              : 'The server returned an unexpected response (' + res.status + ').'
-          );
-        }
-        if (!res.ok) throw new Error(data.error || ('Request failed (' + res.status + ')'));
-        renderResults(data);
-      } catch (err) {
-        results.innerHTML = '';
-        showError('Something went wrong: ' + err.message);
-      } finally {
-        btn.disabled = false;
-        updateReadout();
+      const chosen = PERSONAS.filter(p => selected.has(p.id));
+      const runState = chosen.map(p => ({ id: p.id, name: p.name, tag: p.tag, pending: true }));
+      const meta = { mode: (MODES.find(m => m.key === selectedMode) || {}).name || '', truncated: false };
+      const words = clientWords();
+      const text = manuscriptText;
+
+      renderRun(runState, meta, false);
+      document.getElementById('results').scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+      let maxTotal = null;
+      // Fire one request per mentor so results appear as each finishes.
+      await Promise.all(chosen.map((p, i) =>
+        critiqueOne(text, p.id, selectedMode).then(r => {
+          runState[i] = { id: p.id, name: p.name, tag: p.tag, ...r.result };
+          if (r.mode) meta.mode = r.mode;
+          if (r.truncated) meta.truncated = true;
+          if (typeof r.totalCritiques === 'number') maxTotal = Math.max(maxTotal == null ? 0 : maxTotal, r.totalCritiques);
+        }).catch(err => {
+          runState[i] = { id: p.id, name: p.name, tag: p.tag, verdict: '', score: null, summary: '', critique: '', error: err.message };
+        }).finally(() => {
+          renderRun(runState, meta, false);
+        })
+      ));
+
+      lastRun = { mode: meta.mode, truncated: meta.truncated, results: runState, words };
+      if (maxTotal != null) setCounter(maxTotal); else loadStats();
+      renderRun(runState, meta, true);
+
+      running = false;
+      btn.disabled = false;
+      updateReadout();
+
+      if (currentUser) {
+        let ok = false;
+        try { ok = await saveToHistory(lastRun); } catch { ok = false; }
+        showSaveNote(ok ? 'saved' : 'error');
+      } else {
+        showSaveNote('nudge');
       }
+    }
+
+    async function critiqueOne(text, id, mode) {
+      const res = await fetch('api/critique', {
+        method: 'POST', headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ text, personaIds: [id], mode }),
+      });
+      let data;
+      try { data = await res.json(); }
+      catch {
+        throw new Error(res.status === 404
+          ? 'Backend not running — serve with `npm start` (see README).'
+          : 'Unexpected server response (' + res.status + ').');
+      }
+      if (!res.ok) throw new Error(data.error || ('Request failed (' + res.status + ')'));
+      const result = (data.results && data.results[0]) || { verdict: '', score: null, summary: '', critique: '', error: 'No response.' };
+      return { result, mode: data.mode, truncated: data.truncated, totalCritiques: data.totalCritiques };
     }
 
     function averageScore(results) {
@@ -632,64 +1229,24 @@
       return Math.round(scored.reduce((a, r) => a + r.score, 0) / scored.length);
     }
 
-    function renderResults(data) {
+    function renderRun(runState, meta, done) {
       const results = document.getElementById('results');
-      const modeName = data.mode || '';
-      const words = manuscriptText.trim() ? manuscriptText.trim().split(/\s+/).length : 0;
-      lastRun = { mode: modeName, truncated: !!data.truncated, results: data.results || [], words };
-      setCounter(data.totalCritiques);
-
-      const avg = averageScore(data.results);
-
-      let html =
-        '<div class="results-head"><h2>What the Mentors Said</h2><p>' +
-        escapeHtml(modeName) + (data.truncated ? ' · <span style="color:var(--accent)">only the first ~30,000 characters were read</span>' : '') +
+      const avg = averageScore(runState.filter(r => !r.pending));
+      let html = '<div class="results-head"><h2>What the Mentors Said</h2><p>' +
+        escapeHtml(meta.mode || '') +
+        (meta.truncated ? ' · <span style="color:var(--accent)">only the first ~30,000 characters were read</span>' : '') +
         '</p></div>';
-
-      // ---- Summary / "In short" card ----
-      html += '<div class="rcard summary-card">';
-      html += '<div class="summary-top">';
-      if (avg !== null) {
-        html += '<div class="avgring" style="border-color:' + scoreColor(avg) + '">' +
-          '<div><div class="n" style="color:' + scoreColor(avg) + '">' + avg + '</div><div class="l">avg / 100</div></div></div>';
-      }
-      html += '<div class="summary-headrow"><div><h3>In short</h3>' +
-        '<div class="sub">A plain-English take from each mentor.</div></div>' +
-        '<button id="pdfbtn" class="pdfbtn">⬇ Download PDF</button></div>';
-      html += '</div>';
-      html += '<ul class="summary-list">';
-      (data.results || []).forEach(r => {
-        const take = r.error ? r.error : (r.summary || r.verdict || '—');
-        const badge = typeof r.score === 'number'
-          ? '<span class="sl-score" style="background:' + scoreColor(r.score) + '">' + r.score + '</span>'
-          : '<span class="sl-score" style="background:var(--faint)">—</span>';
-        html += '<li>' + badge + '<div class="sl-body"><span class="sl-name">' + escapeHtml(r.name) + '</span> — ' +
-          '<span class="sl-take">' + escapeHtml(take) + '</span></div></li>';
-      });
-      html += '</ul></div>';
-
-      // ---- Detailed critiques ----
-      (data.results || []).forEach(r => {
-        html += '<div class="rcard">';
-        html += '<div class="rtop">' +
-          '<div class="avatar" style="background:' + colorFor(r.id) + '">' + initials(r.name) + '</div>' +
-          '<div><div class="rname">' + escapeHtml(r.name) + '</div><div class="rtag">' + escapeHtml(r.tag || '') + '</div></div>';
-        if (typeof r.score === 'number') {
-          html += '<div class="rscore"><div class="num" style="color:' + scoreColor(r.score) + '">' + r.score + '</div><div class="lbl">/ 100</div></div>';
-        }
-        html += '</div>';
-        if (r.error) {
-          html += '<p class="rerr">' + escapeHtml(r.error) + '</p>';
-        } else {
-          if (r.verdict) html += '<div class="verdict">“' + escapeHtml(r.verdict) + '”</div>';
-          html += '<div class="critique">' + renderMarkdown(r.critique || '') + '</div>';
-        }
-        html += '</div>';
-      });
-
+      html += '<div class="rcard summary-card"><div class="summary-top">' + avgRingHtml(avg) +
+        '<div class="summary-headrow"><div><h3>In short</h3><div class="sub">A plain-English take from each mentor.</div></div>';
+      if (done) html += '<div class="exp-row" id="exp-row">' + exportButtonsHtml() + '</div>';
+      else html += '<div class="sub" style="color:var(--faint)"><span class="mini-spin"></span> your mentors are reading…</div>';
+      html += '</div></div><ul class="summary-list">' + summaryListHtml(runState) + '</ul></div>';
+      runState.forEach(r => { html += '<div class="rcard' + (r.pending ? ' pending' : '') + '">' + detailInner(r) + '</div>'; });
       results.innerHTML = html;
-      const pdfbtn = document.getElementById('pdfbtn');
-      if (pdfbtn) pdfbtn.addEventListener('click', downloadPdf);
+      if (done) {
+        document.querySelectorAll('#exp-row .exp-btn').forEach(b =>
+          b.addEventListener('click', () => handleExport(b.dataset.exp, lastRun, b)));
+      }
     }
 
     function scoreColor(s) {
@@ -697,86 +1254,6 @@
       if (s >= 50) return '#cf9a3f';
       if (s >= 30) return '#d98c3c';
       return '#cf5a3a';
-    }
-
-    // ---------- PDF export ----------
-    function downloadPdf() {
-      if (!lastRun) return;
-      if (!(window.jspdf && window.jspdf.jsPDF)) {
-        showError('PDF library still loading — give it a second and try again.');
-        return;
-      }
-      const btn = document.getElementById('pdfbtn');
-      if (btn) { btn.disabled = true; btn.textContent = 'Building PDF…'; }
-
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF({ unit: 'pt', format: 'a4' });
-      const W = doc.internal.pageSize.getWidth();
-      const H = doc.internal.pageSize.getHeight();
-      const M = 48;
-      let y = M;
-
-      function ensure(space) { if (y + space > H - M) { doc.addPage(); y = M; } }
-      function write(txt, opts) {
-        opts = opts || {};
-        const size = opts.size || 11;
-        const style = opts.style || 'normal';
-        const color = opts.color || [45, 40, 32];
-        const gapAfter = opts.gapAfter == null ? 10 : opts.gapAfter;
-        const indent = opts.indent || 0;
-        doc.setFont('helvetica', style);
-        doc.setFontSize(size);
-        doc.setTextColor(color[0], color[1], color[2]);
-        const lineH = size * 1.32;
-        const lines = doc.splitTextToSize(String(txt), W - 2 * M - indent);
-        for (const ln of lines) {
-          ensure(lineH);
-          doc.text(ln, M + indent, y);
-          y += lineH;
-        }
-        y += gapAfter;
-      }
-      function rule() { ensure(14); doc.setDrawColor(210, 200, 185); doc.line(M, y, W - M, y); y += 14; }
-
-      const avg = averageScore(lastRun.results);
-
-      // Header
-      write('Manuscript Mentors', { size: 24, style: 'bold', color: [150, 110, 40], gapAfter: 4 });
-      const meta = [lastRun.mode, lastRun.words ? lastRun.words.toLocaleString() + ' words' : null, new Date().toLocaleDateString()]
-        .filter(Boolean).join('   ·   ');
-      write(meta, { size: 10, color: [130, 125, 115], gapAfter: 14 });
-      if (avg !== null) write('Average score:  ' + avg + ' / 100', { size: 15, style: 'bold', color: [40, 40, 40], gapAfter: 6 });
-      if (lastRun.truncated) write('(Only the first ~30,000 characters were read.)', { size: 9, color: [150, 145, 135], gapAfter: 10 });
-      rule();
-
-      // In short
-      write('In short', { size: 15, style: 'bold', color: [40, 40, 40], gapAfter: 8 });
-      lastRun.results.forEach(r => {
-        const s = typeof r.score === 'number' ? r.score + '/100' : '—';
-        write(r.name + '  —  ' + s, { size: 11, style: 'bold', color: [30, 30, 30], gapAfter: 2 });
-        write(r.error ? r.error : (r.summary || r.verdict || '—'), { size: 10, color: [80, 75, 68], gapAfter: 10, indent: 10 });
-      });
-      rule();
-
-      // Full critiques
-      write('Full critiques', { size: 15, style: 'bold', color: [40, 40, 40], gapAfter: 10 });
-      lastRun.results.forEach(r => {
-        ensure(60);
-        const s = typeof r.score === 'number' ? '  ·  ' + r.score + '/100' : '';
-        write(r.name + s, { size: 14, style: 'bold', color: [25, 25, 25], gapAfter: 2 });
-        if (r.tag) write(r.tag, { size: 9, color: [140, 135, 125], gapAfter: 6 });
-        if (r.error) { write(r.error, { size: 10.5, color: [160, 60, 40], gapAfter: 18 }); return; }
-        if (r.verdict) write('“' + r.verdict + '”', { size: 11.5, style: 'italic', color: [110, 85, 35], gapAfter: 8 });
-        const body = String(r.critique || '').replace(/\*\*/g, '').replace(/^[-*•]\s+/gm, '•  ');
-        write(body, { size: 10.5, color: [45, 42, 36], gapAfter: 18 });
-      });
-
-      rule();
-      write('Feedback is AI-generated in the spirit of each figure’s known sensibility, not the real person.',
-        { size: 8, color: [160, 155, 145], gapAfter: 0 });
-
-      doc.save('manuscript-mentors-critique.pdf');
-      if (btn) { btn.disabled = false; btn.textContent = '⬇ Download PDF'; }
     }
 
     // ---------- Helpers ----------
