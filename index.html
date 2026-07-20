@@ -35,6 +35,9 @@
       --sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     }
     * { box-sizing: border-box; }
+    /* Ensure the `hidden` attribute always wins over display rules below
+       (e.g. .modal-scrim{display:flex}, .counter{display:inline-flex}). */
+    [hidden] { display: none !important; }
     html, body { margin: 0; padding: 0; }
     body {
       background: radial-gradient(1200px 700px at 50% -200px, #2e2411 0%, var(--bg) 55%) fixed;
