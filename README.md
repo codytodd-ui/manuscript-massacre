@@ -26,9 +26,14 @@ plus 43 more.
   `.docx`, and `.pdf` uploads (DOCX/PDF parsed in-browser via CDN libraries), or plain paste.
 - **Back end** — one serverless function, [`api/critique.js`](api/critique.js), that
   calls the Anthropic Messages API once per selected mentor (in parallel) and returns
-  each one's verdict, score, and critique.
+  each one's verdict, score, plain-English summary, and full critique.
 - **Data** — all 50 mentors and their critiquing profiles live in
   [`data/personas.json`](data/personas.json).
+- **Critique counter** — a small site-wide counter of critiques delivered, shown under
+  the hero. `GET /api/stats` reads it, and every successful critique call increments
+  it. It's backed by a plain file ([`data/stats.json`](data/stats.json), created at
+  runtime, gitignored — see [`lib/stats.js`](lib/stats.js)), which persists fine on the
+  bundled `server.mjs` but may reset on cold starts on some serverless platforms.
 
 A pure static page can't call an LLM, so this ships as a real app with a tiny backend.
 
@@ -71,9 +76,10 @@ the [Vercel CLI](https://vercel.com/docs/cli) and a `.env.local`).
 
 ### Netlify
 
-Works too — move `api/critique.js` to `netlify/functions/critique.js`, change the
-front-end fetch URL from `api/critique` to `/.netlify/functions/critique`, and set
-`ANTHROPIC_API_KEY` in Netlify's environment variables.
+Works too — move `api/critique.js` and `api/stats.js` (and `lib/stats.js`, adjusting
+their relative import) into `netlify/functions/`, change the front-end fetch URLs from
+`api/critique` / `api/stats` to `/.netlify/functions/critique` / `/.netlify/functions/stats`,
+and set `ANTHROPIC_API_KEY` in Netlify's environment variables.
 
 ## Configuration
 

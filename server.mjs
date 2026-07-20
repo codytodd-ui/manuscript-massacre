@@ -11,7 +11,8 @@ import http from 'node:http';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import handler from './api/critique.js';
+import critiqueHandler from './api/critique.js';
+import statsHandler from './api/stats.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PORT = process.env.PORT || 3000;
@@ -43,10 +44,16 @@ function serveStatic(req, res) {
   });
 }
 
+const API_HANDLERS = {
+  '/api/critique': critiqueHandler,
+  '/api/stats': statsHandler,
+};
+
 const server = http.createServer(async (req, res) => {
   const pathname = req.url.split('?')[0];
+  const apiHandler = API_HANDLERS[pathname];
 
-  if (pathname === '/api/critique') {
+  if (apiHandler) {
     // Read the request body, then hand off to the same function Vercel would call.
     let raw = '';
     for await (const chunk of req) raw += chunk;
@@ -64,7 +71,7 @@ const server = http.createServer(async (req, res) => {
       },
     };
     try {
-      await handler({ method: req.method, body }, shim);
+      await apiHandler({ method: req.method, body }, shim);
     } catch (err) {
       res.writeHead(500, { 'content-type': 'application/json' });
       res.end(JSON.stringify({ error: 'Server error: ' + err.message }));

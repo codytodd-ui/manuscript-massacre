@@ -56,6 +56,13 @@
     }
     .subtitle { color: var(--muted); max-width: 640px; margin: 8px auto 0; font-size: 17px; }
     .blade { width: 120px; height: 2px; margin: 22px auto 0; background: linear-gradient(90deg, transparent, var(--accent), transparent); }
+    .counter {
+      display: inline-flex; align-items: center; gap: 8px; margin-top: 22px;
+      background: var(--panel-2); border: 1px solid var(--line); border-radius: 999px;
+      padding: 8px 18px; font-size: 13.5px; color: var(--muted);
+    }
+    .counter b { color: var(--accent-2); font-weight: 800; }
+    .counter .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--sage); flex: none; }
 
     /* Steps */
     section.step {
@@ -232,6 +239,7 @@
       header.hero { padding: 40px 6px 24px; }
       .subtitle { font-size: 15.5px; }
       .blade { margin-top: 18px; }
+      .counter { margin-top: 16px; font-size: 12.5px; padding: 7px 14px; text-align: center; }
 
       section.step { padding: 18px 15px; margin-top: 16px; }
       .step-head { gap: 10px; }
@@ -288,6 +296,7 @@
       <h1 class="title">Manuscript Mentors</h1>
       <p class="subtitle">Paste or upload your work. Gather up to <b>five of fifty</b> great minds — saints, novelists, poets, philosophers, and sharp-eyed wits — and choose exactly how you'd like to be mentored.</p>
       <div class="blade"></div>
+      <div class="counter" id="counter" aria-live="polite" hidden></div>
     </header>
 
     <!-- STEP 1 -->
@@ -398,6 +407,30 @@
       renderModes();
       wireInputs();
       updateReadout();
+      loadStats();
+    }
+
+    // ---------- Critique counter ----------
+    async function loadStats() {
+      try {
+        const res = await fetch('api/stats');
+        if (!res.ok) return;
+        const data = await res.json();
+        setCounter(data.totalCritiques);
+      } catch {
+        // No backend reachable (e.g. index.html opened directly from disk) — leave it hidden.
+      }
+    }
+
+    function setCounter(n) {
+      if (typeof n !== 'number' || !Number.isFinite(n)) return;
+      const el = document.getElementById('counter');
+      if (!el) return;
+      const label = n === 0
+        ? 'No critiques delivered yet — be the first'
+        : '<b>' + n.toLocaleString() + '</b> critique' + (n === 1 ? '' : 's') + ' delivered so far';
+      el.innerHTML = '<span class="dot"></span>' + label;
+      el.hidden = false;
     }
 
     // ---------- Step 1: input ----------
@@ -604,6 +637,7 @@
       const modeName = data.mode || '';
       const words = manuscriptText.trim() ? manuscriptText.trim().split(/\s+/).length : 0;
       lastRun = { mode: modeName, truncated: !!data.truncated, results: data.results || [], words };
+      setCounter(data.totalCritiques);
 
       const avg = averageScore(data.results);
 

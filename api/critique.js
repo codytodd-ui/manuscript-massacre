@@ -1,10 +1,11 @@
 // Manuscript Mentors — serverless critique endpoint (Vercel-style Node function).
-// POST { text, personaIds: string[], mode } -> { results: [{ id, name, verdict, score, critique }] }
+// POST { text, personaIds: string[], mode } -> { results: [{ id, name, verdict, score, summary, critique }], totalCritiques }
 //
 // Requires env ANTHROPIC_API_KEY. Optional env ANTHROPIC_MODEL (default: claude-sonnet-5).
 
 import fs from 'node:fs';
 import path from 'node:path';
+import { incrementStats } from '../lib/stats.js';
 
 const MODEL = process.env.ANTHROPIC_MODEL || 'claude-sonnet-5';
 const MAX_CHARS = 30000; // manuscript characters sent per critique call
@@ -229,7 +230,10 @@ export default async function handler(req, res) {
       };
     });
 
-    res.status(200).json({ mode: mode.label, truncated, results });
+    const successCount = results.filter((r) => !r.error).length;
+    const stats = incrementStats(successCount);
+
+    res.status(200).json({ mode: mode.label, truncated, results, totalCritiques: stats.totalCritiques });
   } catch (err) {
     res.status(500).json({ error: `Critique failed: ${err.message}` });
   }

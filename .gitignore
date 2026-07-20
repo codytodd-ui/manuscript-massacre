@@ -4,3 +4,6 @@ node_modules/
 .env.local
 *.log
 .DS_Store
+
+# Runtime counter data — generated at runtime, not source.
+data/stats.json
