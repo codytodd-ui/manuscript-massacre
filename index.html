@@ -343,8 +343,19 @@
     }
     .savenote.nudge { background: var(--panel-2); border-color: var(--line); color: var(--muted); }
     .savenote a, .savenote button.linky { color: var(--accent-2); background: none; border: 0; font: inherit; font-weight: 700; cursor: pointer; padding: 0; }
-    .savenote .note-x { margin-left: auto; background: none; border: 0; color: var(--muted); font-size: 20px; line-height: 1; cursor: pointer; padding: 0 2px; }
+    .savenote .note-x { margin-left: auto; background: none; border: 0; color: var(--muted); font-size: 20px; line-height: 1; cursor: pointer; padding: 0 2px; align-self: flex-start; }
     .savenote .note-x:hover { color: var(--ink); }
+    .savenote.cta { align-items: center; gap: 16px; background: linear-gradient(180deg, #241d12, #1b160f); border-color: var(--accent); color: var(--ink); }
+    .savenote.cta .cta-text { flex: 1; min-width: 200px; font-size: 14px; line-height: 1.5; }
+    .savenote.cta .cta-text b { color: var(--accent-2); font-size: 15px; }
+    .savenote.cta .cta-text span { color: var(--muted); }
+    .savenote.cta .cta-actions { display: flex; align-items: center; gap: 14px; flex: none; }
+    .cta-btn { border: 0; cursor: pointer; font: inherit; font-weight: 800; color: #241900; background: linear-gradient(180deg, var(--accent-2), var(--accent)); padding: 11px 18px; border-radius: 10px; font-size: 14px; white-space: nowrap; box-shadow: 0 6px 16px rgba(207,154,63,.25); }
+    .cta-btn:hover { filter: brightness(1.06); }
+    @media (max-width: 640px) {
+      .savenote.cta .cta-actions { width: 100%; }
+      .savenote.cta .cta-btn { flex: 1; text-align: center; }
+    }
 
     /* ---------- Export row ---------- */
     .exp-row { display: flex; gap: 8px; flex-wrap: wrap; }
@@ -831,12 +842,17 @@
       } else if (kind === 'error') {
         html = '<div class="savenote nudge">Couldn’t save this to your dashboard — but it’s ready above.</div>';
       } else {
-        html = '<div class="savenote nudge"><span>No account needed — your critique is ready above. Optionally <button class="linky" id="note-signup">create a free account</button> to keep a history.</span>' +
+        html = '<div class="savenote cta">' +
+          '<div class="cta-text"><b>Want to keep this critique?</b><br>' +
+          '<span>Create a free account to save every critique to a personal dashboard.</span></div>' +
+          '<div class="cta-actions"><button class="cta-btn" id="note-signup">Create free account</button>' +
+          '<button class="linky" id="note-login">Log in</button></div>' +
           '<button class="note-x" id="note-x" aria-label="Dismiss">×</button></div>';
       }
       head.insertAdjacentHTML('afterend', html);
       const d = document.getElementById('note-dash'); if (d) d.onclick = showDashboard;
       const s = document.getElementById('note-signup'); if (s) s.onclick = () => openAuth('signup');
+      const l = document.getElementById('note-login'); if (l) l.onclick = () => openAuth('login');
       const x = document.getElementById('note-x'); if (x) x.onclick = (e) => {
         const note = e.target.closest('.savenote'); if (note) note.remove();
         try { localStorage.setItem('mm_hide_nudge', '1'); } catch {}
