@@ -556,6 +556,7 @@
     let searchTerm = '';
     let selectedMode = null;
     let lastRun = null; // { mode, truncated, results, words } — kept for export
+    let lastRunSaved = false; // whether lastRun is already in the signed-in user's history
     let currentUser = null; // { id, email, name } when signed in
     let running = false;
     const DRAFT_KEY = 'mm_draft_v1';
@@ -715,6 +716,8 @@
         renderTopbar();
         closeAuth();
         document.getElementById('auth-form').reset();
+        // If they just ran a critique anonymously, save it to their new profile now.
+        savePendingRun();
       } catch {
         errEl.textContent = 'Could not reach the server.';
       } finally {
@@ -1231,12 +1234,28 @@
       btn.disabled = false;
       updateReadout();
 
+      lastRunSaved = false;
       if (currentUser) {
         let ok = false;
         try { ok = await saveToHistory(lastRun); } catch { ok = false; }
+        lastRunSaved = ok;
         showSaveNote(ok ? 'saved' : 'error');
       } else {
         showSaveNote('nudge');
+      }
+    }
+
+    // When someone signs up / logs in right after an anonymous run, persist
+    // that run to their new profile so the critique they wanted to keep is saved.
+    async function savePendingRun() {
+      if (!currentUser || !lastRun || lastRunSaved) return;
+      let ok = false;
+      try { ok = await saveToHistory(lastRun); } catch { ok = false; }
+      lastRunSaved = ok;
+      if (ok) {
+        const existing = document.querySelector('.savenote');
+        if (existing) existing.remove();
+        showSaveNote('saved');
       }
     }
 
